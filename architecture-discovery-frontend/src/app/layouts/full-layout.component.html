@@ -1,0 +1,60 @@
+<header class="app-header navbar">
+    <button class="navbar-toggler d-lg-none" type="button" appMobileSidebarToggler>&#9776;</button>
+    <a class="navbar-brand" href="#"></a>
+    <ul class="nav navbar-nav mr-auto d-md-down-none">
+        <li class="nav-item">
+            <a class="nav-link navbar-toggler" href="#" appSidebarToggler>&#9776;</a>
+        </li>
+    </ul>
+</header>
+<div class="app-body">
+    <toaster-container [toasterconfig]="toasterconfig"></toaster-container>
+    <div class="sidebar">
+        <nav class="sidebar-nav">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link" routerLinkActive="active" [routerLink]="['/dependency-matrix']"><i class="fa fa-th"></i>Adjacency Matrix</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" routerLinkActive="active" [routerLink]="['/livelog']"><i class="fa fa-list"></i>Architecture Livelog <span class="badge badge-pill badge-info" *ngIf="livechangeCount > 0">{{livechangeCount}}</span></a>
+                </li>
+                <li class="nav-item nav-dropdown open" routerLinkActive="open" appNavDropdown>
+                    <a class="nav-link nav-dropdown-toggle" href="#" appNavDropdownToggle><i class="fa fa-edit"></i> Modelling</a>
+                    <ul class="nav-dropdown-items">
+                        <li class="nav-item">
+                            <a class="nav-link" routerLinkActive="active" [routerLink]="['/modeller']"><i class="fa fa-sitemap"></i>Process Modeller</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" routerLinkActive="active" [routerLink]="['/activity-mapper']"><i class="fa fa-connectdevelop"></i>Activity Mapper</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+        </nav>
+    </div>
+
+    <!-- Main content -->
+    <main class="main d-flex flex-column">
+
+        <!-- Breadcrumb -->
+        <ol class="breadcrumb">
+            <app-breadcrumbs></app-breadcrumbs>
+        </ol>
+
+        <div style="flex:1">
+            <div class="container-fluid" style="height:100%; overflow:hidden">
+                <router-outlet></router-outlet>
+            </div>
+        </div>
+        <!-- /.conainer-fluid -->
+    </main>
+</div>
+
+<!--
+<footer class="app-footer">
+    <a href="https://genesisui.com">Prime</a> &copy; 2017 creativeLabs.
+    <span class="float-right">Powered by <a href="https://genesisui.com">GenesisUI</a>
+    </span>
+</footer>
+-->

@@ -1,0 +1,216 @@
+<div class="animated fadeIn d-flex flex-row" style="position:absolute; bottom:0px; top:0px; left:30px; right:30px;">
+    <div class="card" style="width:100%; overflow:hidden; z-index:0">
+        <div class="card-block d-flex flex-column" style="position:relative">
+            <div class="row headline">
+                <div class="col-md-12">
+                    <h4 class="card-title mb-0">Architecture Adjacency Matrix</h4>
+                    <div class="text-muted" style="font-size:14px" *ngIf="loadedArchitecture">
+                        Time of snapshot:
+                        <span *ngIf="fetchedSnapshot != null">{{fetchedSnapshot| date:'yyyy-MM-dd HH:mm:ss'}}</span>
+                        <span *ngIf="fetchedSnapshot == null" class="badge badge-default">LIVE</span>
+                        <span *ngIf="fetchedSnapshotOutdated" class="badge badge-danger">OUTDATED!</span>
+                    </div>
+                </div>
+            </div>
+            <hr class="mb-4" style="margin-left:0px; margin-right:0px; position:relative">
+            <div style="flex:1;" *ngIf="!btnLoader.get('FETCH').value && loadedArchitecture == null">
+                <div style="position: absolute;top: 50%; width:100%; text-align:center; transform: translateY(-50%); font-size:30px; color:#ccc"
+                    *ngIf="!selectedProcess">Press "Fetch architecture" on the right</div>
+            </div>
+            <div style="flex:1;" *ngIf="btnLoader.get('FETCH').value">
+                <div style="position: absolute;top: 50%; width:100%; text-align:center; transform: translateY(-50%); font-size:30px; color:#ccc"
+                    *ngIf="!selectedProcess">
+                    <div class="card-block">
+                        <div class="sk-wave">
+                            <div class="sk-rect sk-rect1"></div>
+                            <div class="sk-rect sk-rect2"></div>
+                            <div class="sk-rect sk-rect3"></div>
+                            <div class="sk-rect sk-rect4"></div>
+                            <div class="sk-rect sk-rect5"></div>
+                        </div>
+                        <div style="text-align:center">Fetching architecture...</div>
+                    </div>
+                </div>
+            </div>
+            <div style="position:absolute; left:0px; right:0px; top:75px; text-align:center; font-size:20px; color: #ccc">Successors -> </div>
+            <div style="position:absolute; top:50%; bottom:0px; left:0px; font-size:20px; color: #ccc;"><div style="margin-left:-50px; transform: rotate(-90.0deg);">&lt;- Predecessors</div></div>
+            <div *ngIf="dependencyMatrixData != null" style="overflow:auto;margin-top:20px; margin-left:24px; position:relative;" class="dependency-matrix-container">
+                <table class="dependency-matrix table table-bordered">
+                    <thead>
+                        <tr class="mrow">
+                            <th class="invisible-cell" style="border-right:1px solid white"></th>
+                            <th class="invisible-cell mcol"></th>
+                            <th *ngFor="let revision of dependencyMatrixData.revisions; let colIndex = index" [ngClass]="['mcol', 'cmptype-' + ComponentType[revision.component.type]]">{{(ComponentType[revision.component.type])| truncate : 1}}{{dependencyMatrixData.typeIndex[colIndex]}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="mrow">
+                            <th></th>
+                            <th class="mcol"></th>
+                            <th class="mcol" *ngFor="let count of dependencyMatrixData.revisions">
+                            </th>
+                        </tr>
+                        <tr *ngFor="let row of dependencyMatrixData.matrix; let rowIndex=index" class="mrow">
+                            <th class="legend" [tooltip]="dependencyMatrixData.labels[rowIndex]" container="body">
+                                <span>{{dependencyMatrixData.labels[rowIndex]}}</span>
+                            </th>
+                            <th [ngClass]="['cmptype-col', 'cmptype-' + ComponentType[dependencyMatrixData.revisions[rowIndex].component.type]]">
+                                {{(ComponentType[dependencyMatrixData.revisions[rowIndex].component.type])| truncate : 1}}{{dependencyMatrixData.typeIndex[rowIndex]}}
+                            </th>
+                            <ng-container *ngFor="let relationData of row; let colIndex=index">
+                                <template #popTemplate>
+                                    <table class="pop-table">
+                                        <tr>
+                                            <th style="font-weight:normal">{{relationData.ownerTypeLabel}}</th>
+                                            <td style="font-weight:bold">{{relationData.ownerLabel}}</td>
+                                        </tr>
+                                        <tr>
+                                            <th></th>
+                                            <td>{{relationData.dependencyText}}</td>
+                                        </tr>
+                                        <tr>
+                                            <th style="font-weight:normal">{{relationData.calleeTypeLabel}}</th>
+                                            <td style="font-weight:bold">{{relationData.calleeLabel}}</td>
+                                        </tr>
+                                        <tr *ngIf="relationData.callerLabel != relationData.ownerLabel">
+                                            <th style="font-weight:normal"></th>
+                                            <td>because of</td>
+                                        </tr>
+                                        <tr *ngIf="relationData.callerLabel != relationData.ownerLabel">
+                                            <th style="font-weight:normal">{{relationData.callerTypeLabel}}</th>
+                                            <td>{{relationData.callerLabel}}</td>
+                                        </tr>
+                                        <ng-container *ngIf="Array.from(relationData.relation.annotations.keys()).length > 0">
+                                            <tr>
+                                                <td>&nbsp;</td>
+                                            </tr>
+                                            <tr>
+                                                <th><i style="color:#999">Annotations</i></th>
+                                            </tr>
+                                            <ng-container [ngSwitch]="key" *ngFor="let key of Array.from(relationData.relation.annotations.keys())">
+                                                <tr *ngSwitchCase="'ad.discovered_at'">
+                                                    <th>First seen</th>
+                                                    <td>{{relationData.relation.annotations.get(key)| date:'yyyy-MM-dd hh:mm:ss'}}</td>
+                                                </tr>
+                                                <tr *ngSwitchCase="'ad.async'">
+                                                    <th>Asynchronous</th>
+                                                    <td>true</td>
+                                                </tr>
+                                                <tr *ngSwitchCase="'sa'"></tr>
+                                                <tr *ngSwitchDefault>
+                                                    <th>{{key}}</th>
+                                                    <td>{{relationData.relation.annotations.get(key)}}</td>
+                                                </tr>
+                                            </ng-container>
+                                        </ng-container>
+                                    </table>
+
+                                </template>
+                                <td *ngIf="relationData">
+
+                                    <button style="width:100%; background: transparent; outline: none; border:none" [popover]="popTemplate" popoverTitle="Relation Details"
+                                        placement="right" container="body" triggers="focus" *ngIf="relationData.ownerLabel == relationData.callerLabel">x</button>
+                                    <button style="width:100%; background: transparent; outline: none; border:none; color: #aaa" [popover]="popTemplate" popoverTitle="Relation Details"
+                                        placement="right" container="body" triggers="focus" *ngIf="relationData.ownerLabel != relationData.callerLabel && showIndirectRelations">x</button>
+                                </td>
+                                <td *ngIf="!relationData && colIndex == rowIndex">
+                                    -
+                                </td>
+                                <td *ngIf="!relationData && colIndex != rowIndex">
+                                </td>
+
+                            </ng-container>
+                        </tr>
+                        <tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!--/.col-->
+    <div class="card" style="background-color:#fafafa; border-left:none; min-width:330px; max-width:330px;">
+
+        <div class="card-block" style="overflow-y:auto">
+            <div class="row headline">
+                <div class="col-md-12">
+                    <h4 class="card-title mb-0">Architecture Time</h4>
+                </div>
+            </div>
+            <hr class="mb-4" style="margin-left:0px; margin-right:0px;">
+            <div class="form-group">
+                <label for="email">Architecture from</label>
+                <label class="switch switch-text switch-primary switch-lg switch-responsive pull-right">
+                    <input type="checkbox" class="switch-input" [(ngModel)]="snapshotFilter.now" >
+                    <span class="switch-label" data-on="NOW" data-off="NOW">NOW</span>
+                    <span class="switch-handle"></span>
+                </label>
+                <div *ngIf="!snapshotFilter.now" class="text-muted" style="font-size:12px; margin-top:-10px">{{snapshotFilter.date| date:'yyyy-MM-dd'}} {{snapshotFilter.time| date:'HH:mm:ss'}}</div>
+            </div>
+            <div *ngIf="!snapshotFilter.now">
+                <div class="form-group">
+                    <datepicker [(ngModel)]="snapshotFilter.date" [showWeeks]="true"></datepicker>
+                </div>
+                <div class="form-group" style="text-align: center;margin-top: -15px;padding-left: 55px;">
+                    <timepicker [(ngModel)]="snapshotFilter.time" [hourStep]="1" [minuteStep]="1" [showSeconds]="true" [showMeridian]="false"></timepicker>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="button" class="btn btn-primary btn-block" (click)="fetchArchitecture()" style="z-index: 10;" [ladda]='btnLoader.get("FETCH").value'><i class="fa fa-cloud-download" style="font-size:18px; padding-right:10px; margin-top:4px"></i> Fetch architecture</button>
+            </div>
+
+            <hr class="mb-4" style="margin-left:0px; margin-right:0px; margin-top:20px;">
+            <div class="row headline">
+                <div class="col-md-12">
+                    <h4 class="card-title mb-0">Matrix Filters</h4>
+                </div>
+            </div>
+            <hr class="mb-4" style="margin-left:0px; margin-right:0px;">
+
+            <div class="form-group">
+                <b>Layers</b><br/><br/>
+                <div style="margin-bottom:9px" *ngFor="let componentType of consideredLayerTypes">
+                    <span [class]="'color-block cmptype-' + ComponentType[componentType]"></span>
+                    <label for="email">{{ComponentType[componentType]}}</label>
+                    <label class="switch switch-text switch-primary switch-lg switch-responsive pull-right">
+                                <input type="checkbox" class="switch-input" [(ngModel)]="layerFilterMap.get(componentType).value" (change) ="filterArchitecture()" >
+                                <span class="switch-label" data-on="ON" data-off="OFF">OFF</span>
+                                <span class="switch-handle"></span>
+                            </label>
+                </div>
+
+                <div style="margin-bottom:9px; margin-top:20px">
+                    <b>Relations</b><br/><br/>
+                    <label for="email">Indirect Relations</label>
+                    <label class="switch switch-text switch-primary switch-lg switch-responsive pull-right">
+                                    <input type="checkbox" class="switch-input" [(ngModel)]="showIndirectRelations" >
+                                    <span class="switch-label" data-on="ON" data-off="OFF">OFF</span>
+                                    <span class="switch-handle"></span>
+                                </label>
+                </div>
+            </div>
+
+            <div *ngIf="!saveRequired && selectedProcess">
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <button type="button" class="btn btn-block btn-default" (click)="showRenameProcessModal()"><i class="fa fa-edit" ></i> Rename</button>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <button type="button" class="btn btn-danger btn-block" (click)="deleteProcess()" [ladda]='btnLoader.get("DELETE").value'><i class="fa fa-remove" ></i> Delete</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" *ngIf="saveRequired">
+                <label for="email"><b>Process model has unsaved changes</b></label>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <button type="button" class="btn btn-block btn-default" (click)="setCurrentProcess(selectedProcess)"><i class="fa fa-remove" ></i> Discard</button>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <button type="button" class="btn btn-success btn-block" (click)="saveProcess()" [ladda]='btnLoader.get("SAVE").value'><i class="fa fa-save" ></i> Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

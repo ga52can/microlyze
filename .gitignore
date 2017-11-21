@@ -1,0 +1,7 @@
+.idea
+architecture-discovery-service/target*/
+npm-debug.log.*
+node_modules/
+
+nohup.txt
+nohup.out

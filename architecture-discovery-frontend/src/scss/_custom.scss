@@ -1,0 +1,258 @@
+// Here you can add other styles
+@import "../../node_modules/jointjs/css/layout.css";
+@import "../../node_modules/jointjs/css/themes/default.css";
+//@import "../../node_modules/jointjs/css/themes/modern.css";
+
+@import "../../node_modules/regex-colorizer/themes/default.css";
+
+.joint-port{
+    opacity:0.2;
+}
+
+.joint-cell:hover .joint-port{
+    opacity:1;
+}
+
+.form-control {
+    color: #000 !important;
+}
+
+.list-striped>a {
+    color: #444D58 !important;
+}
+
+.list-striped>:nth-child(odd)  {
+    background-color:#f9f9f9;
+}
+
+.list-striped>.list-group-item-action:nth-child(odd):hover  {
+    background-color:#F1F3F8;
+}
+
+.row.headline{
+    min-height:30px;
+    max-height:30px;
+}
+
+.fullheight>.nav {
+    position:absolute;
+    z-index:1;
+}
+
+.fullheight>.tab-content{
+    position:absolute;
+    bottom:30px;
+    top:36px;
+    left:30px;
+    right:30px;
+}
+
+.fullheight>.tab-content>.tab-pane {
+    height:100%;
+}
+
+a{
+    cursor: pointer;
+}
+
+.switch-lg.switch-responsive {
+    width:auto !important;
+}
+
+.switch.switch-responsive.switch-text.switch-lg .switch-input:checked ~ .switch-handle {
+    left: calc(100% - 26px) !important;
+    //right: 3px !important;
+}
+
+.switch-lg.switch-responsive .switch-label::before {
+    right: 8px !important;
+}
+
+.switch-lg.switch-responsive .switch-label {
+    padding-left:14px !important;
+    padding-right:24px !important;
+    color: transparent;
+}
+
+.glyphicon {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; }
+
+.glyphicon-chevron-up::before {
+  content: "\f077"; }
+
+.glyphicon-chevron-down::before {
+  content: "\f078"; }
+
+.glyphicon-chevron-left::before {
+  content: "\f053"; }
+
+.glyphicon-chevron-right::before {
+  content: "\f054"; }
+
+table.dependency-matrix {
+    overflow: hidden;
+    width: initial;
+    position:relative;
+    border-top:none;
+    display:inline-block;
+    border-left: none;
+    border-right: none;
+    border-top:none;
+
+
+    thead {
+        position:absolute;
+        z-index:2;
+        margin: 0px 0px 0px 0px;
+    }
+
+    thead th {
+        border-bottom-width: 1px;
+    }
+
+    thead th.hover, tbody th.hover {
+        font-weight:bold;
+    }
+
+    tbody th.cmptype-col {
+        position:absolute;
+        height:36px;
+        width:36px;
+        line-height:33px;
+        margin-left:-1px;
+        z-index:1;
+    }
+
+    tbody>tr:nth-child(2)>th:nth-child(2) {
+        border-top:none;
+    }
+
+    tr {
+        height:35px;
+    }
+
+    td, th {
+        position: relative;
+        outline: 0;
+        padding:0px;
+        vertical-align:middle;
+    }
+
+    th {
+        background-color: #fafafa;
+        font-weight:normal;
+    }
+
+    .mcol {
+        width:35px;
+        min-width:35px;
+    }
+
+    .mcol, td, tbody th+th {
+        text-align:center;
+    }
+
+    th.legend{
+        max-width: 300px;
+        width: 300px;
+        text-overflow:ellipsis;
+        white-space: nowrap;
+        overflow:hidden;
+        text-align:right;
+        padding: 0px 5px;
+    }
+
+    td:hover::after,
+    thead th:not(:empty):hover::after { 
+        content: '';  
+        height: 10000px;
+        left: 0;
+        position: absolute;  
+        top: -5000px;
+        width: 100%;
+        z-index: -1;
+    }
+
+    tbody tr:hover td,
+    td:hover::after,
+    th:hover::after {
+        background-color: rgba(0,0,0,0.1) !important;
+    }
+
+    thead th .header-label {
+        @extend th;
+        height:34px;
+        white-space: nowrap;
+        left:34px;
+        position:absolute;
+        z-index: 1;
+        top: 0px;
+        line-height:33px;
+        padding: 0px 4px;
+        font-weight:bold;
+        color:#000;
+    }
+
+    thead th .header-label.header-label-left {
+        left:auto;
+        right:34px;
+        text-align:right;
+        
+    }
+
+    th.invisible-cell {
+        background-color:white;
+        border-left:1px solid white;
+        border-top:1px solid white;
+    }
+}
+
+
+.cmptype-Process{
+    background-color: #99D3DF !important;
+    color:#fff;
+}
+
+.cmptype-Activity{
+    background-color: #88BBD6 !important;
+    color:#fff;
+}
+
+.cmptype-Service {
+    background-color: #849dbd !important;
+    color:#fff;
+}
+
+.cmptype-Instance {
+    background-color: #CDCDCD !important;
+    color:#000;
+}
+
+.cmptype-Hardware {
+    background-color: #E9e9e9 !important;
+    color:#000;
+}
+
+.color-block {
+    display:inline-block;
+    margin-bottom:-3px;
+    width:16px;
+    height:16px;
+}
+
+table.pop-table {
+    td {
+        
+        padding: 0px 10px;
+        white-space: nowrap;   
+    }
+}
+
+.popover {
+    max-width:600px !important;
+}

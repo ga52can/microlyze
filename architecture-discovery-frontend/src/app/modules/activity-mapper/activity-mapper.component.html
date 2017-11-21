@@ -1,0 +1,25 @@
+<div *ngIf="dataloadCount>0" style="position: absolute;top: 50%; text-align:center; width:100%; transform: translateY(-50%); font-size:30px; color:#ccc">
+    <div class="sk-wave">
+        <div class="sk-rect sk-rect1"></div>
+        <div class="sk-rect sk-rect2"></div>
+        <div class="sk-rect sk-rect3"></div>
+        <div class="sk-rect sk-rect4"></div>
+        <div class="sk-rect sk-rect5"></div>
+    </div>
+    <div style="text-align:center">Please wait, fetching data...</div>
+</div>
+
+<tabset style="width:100%" class="fullheight" *ngIf="dataloadCount<=0" >
+    <tab heading="Simple Mapping">
+        <simple-mapper-component [unmappedTraces]="unmappedTraces" [processes]="processes" [activityMap]="activityMap">
+        </simple-mapper-component>
+    </tab>
+    <tab heading="Rule-based Mapping">
+        <regex-mapper-component  [unmappedTraces]="unmappedTraces" [processes]="processes" [activityMap]="activityMap">
+        </regex-mapper-component>
+    </tab>
+    <tab heading="Existing Mappings" (select)="onOpenExisting()">
+        <existing-mappings-component [processes]="processes" [activityMap]="activityMap" #existingMappingsComponent>
+        </existing-mappings-component>
+    </tab>
+</tabset>

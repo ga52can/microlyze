@@ -1,0 +1,142 @@
+<div class="d-flex flex-row align-items-stretch" style="height:100%">
+    <div class="card flex-column" style="width:100%; margin-right:10px; margin-bottom:0px;">
+        <div class="card-block d-flex flex-column">
+            <div class="row headline">
+                <div class="col-md-12">
+                    <h4 class="card-title mb-0">Unmapped paths</h4>
+                </div>
+            </div>
+            <hr class="mb-4" style="margin-left:0px; margin-right:0px; position:relative">
+            <div style="position:absolute; bottom:0px; top:90px; left:20px; right:20px; overflow-y: auto">
+                <div style="position: absolute;top: 50%; text-align:center; width:100%; transform: translateY(-50%); font-size:30px; color:#ccc"
+                    *ngIf="unmappedTraces.length == 0">No unmapped paths available</div>
+                <div class="list-group list-striped">
+                    <div *ngFor="let trace of getNotSelectedTraces()" class="list-group-item flex-column align-items-start">
+                        <p class="mb-1">{{trace.httpPath}}</p>
+                        <span><span class="badge badge-default">{{HttpMethod[trace.httpMethod]}}</span> <small> first seen: {{trace.time | date:'yyyy-MM-dd HH:mm:ss'}}</small></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card flex-column" style="width:100%;  margin-bottom:0px;">
+        <div class="card-block d-flex flex-column">
+            <div class="row headline">
+                <div class="col-md-12">
+                    <h4 class="card-title mb-0">Rule definition</h4>
+                </div>
+            </div>
+            <hr class="mb-4" style="margin-left:0px; margin-right:0px; position:relative">
+
+            <div style="text-align:right;">
+                <label class="switch switch-text switch-primary switch-lg switch-responsive">
+                    <input type="checkbox" class="switch-input" [(ngModel)]="httpMethodMap.get(HttpMethod.GET).value" >
+                    <span class="switch-label" data-on="GET" data-off="GET">GET</span>
+                    <span class="switch-handle"></span>
+                </label>
+                <label class="switch switch-text switch-primary switch-lg switch-responsive">
+                    <input type="checkbox" class="switch-input" [(ngModel)]="httpMethodMap.get(HttpMethod.POST).value" >
+                    <span class="switch-label" data-on="POST" data-off="POST">POST</span>
+                    <span class="switch-handle"></span>
+                </label>
+                <label class="switch switch-text switch-primary switch-lg switch-responsive">
+                    <input type="checkbox" class="switch-input" [(ngModel)]="httpMethodMap.get(HttpMethod.PUT).value" >
+                    <span class="switch-label" data-on="PUT" data-off="PUT">PUT</span>
+                    <span class="switch-handle"></span>
+                </label>
+                <label class="switch switch-text switch-primary switch-lg switch-responsive">
+                    <input type="checkbox" class="switch-input" [(ngModel)]="httpMethodMap.get(HttpMethod.DELETE).value" >
+                    <span class="switch-label" data-on="DELETE" data-off="DELETE">DELETE</span>
+                    <span class="switch-handle"></span>
+                </label>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Regex:</span>
+                <input type="text" class="form-control" placeholder="regular expression (e.g. ^http/book/[0-9]+$) " [(ngModel)]="regex" (keyup)="updateRegex()"
+                />
+            </div>
+            <div class="input-group" *ngIf='regex != ""' style="margin-top:20px">
+                <span class="input-group-addon">Parsed:</span>
+                <div class="form-control" style="background-color:#f9f9f9">
+                    <span style="font-size:12px" class="regex" [innerHTML]='regexColorized'></span>
+                </div>
+                <span class="input-group-addon">
+                    <i  *ngIf="!regexValid" class="fa fa-times-circle" style="font-size:20px; color:red"></i>
+                    <i  *ngIf="regexValid" class="fa fa-check-circle" style="font-size:20px; color:green"></i>
+                </span>
+            </div>
+
+            <div *ngIf="!regexValid" style="padding-top:8px;" class="text-center">
+                <span class="fa fa-exclamation text-danger"></span> Your regular expression is invalid! Check the red marked parts.
+            </div>
+
+            <div *ngIf='regexValid && regex!= ""'>
+                <div style="padding-top:36px">
+                    <h5>Matching paths:</h5>
+                </div>
+                <div style="position:absolute; bottom:0px; top:290px; left:20px; right:20px; overflow-y: auto">
+                    <div style="position: absolute;top: 50px; text-align:center; width:100%; transform: translateY(-50%); font-size:30px; color:#ccc"
+                        *ngIf="getSelectedTraces().length == 0">No unmapped paths match with this expression</div>
+                    <div class="list-group list-striped">
+                        <div *ngFor="let trace of getSelectedTraces()" class="list-group-item flex-column align-items-start">
+                            <p class="mb-1">{{trace.httpPath}}</p>
+                            <span><span class="badge badge-default">{{HttpMethod[trace.httpMethod]}}</span> <small> first seen: {{trace.time | date:'yyyy-MM-dd HH:mm:ss'}}</small></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card" style="background-color:#fafafa; border-left:none; min-width:330px; max-width:330px; margin-bottom:0px;">
+        <div class="card-block" *ngIf="false">
+            <div class="sk-wave">
+                <div class="sk-rect sk-rect1"></div>
+                <div class="sk-rect sk-rect2"></div>
+                <div class="sk-rect sk-rect3"></div>
+                <div class="sk-rect sk-rect4"></div>
+                <div class="sk-rect sk-rect5"></div>
+            </div>
+            <div style="text-align:center">Fetching Processes</div>
+        </div>
+        <div class="card-block" *ngIf="true">
+            <div class="row headline">
+                <div class="col-md-12">
+                    <h4 class="card-title mb-0">Assign paths to activity</h4>
+                </div>
+            </div>
+            <hr class="mb-4" style="margin-left:0px; margin-right:0px;">
+            <div class="form-group">
+                <label for="email">Selected Process:</label>
+                <select class="form-control" id="ccmonth" [(ngModel)]="selectedProcess" (change)="unsetSelectedActivity()">
+                            <option [ngValue]="undefined" selected disabled>Select a process</option>
+                            <option *ngFor="let process of processes" [ngValue]="process">{{process.label}}</option>
+                        </select>
+            </div>
+            <div class="form-group" *ngIf="selectedProcess">
+                <label for="email">Selected Activity:</label>
+                <select class="form-control" id="ccmonth" [(ngModel)]="selectedActivity">
+                            <option [ngValue]="undefined" selected disabled>Select a Activity</option>
+                            <option *ngFor="let activity of activityMap.get(selectedProcess.id)" [ngValue]="activity">{{activity.label}}</option>
+                        </select>
+            </div>
+            <div *ngIf="selectedProcess && selectedActivity">
+                <div class="form-group" *ngIf='regex == ""'>
+                    <span class="fa fa-exclamation text-danger"></span> Please define a regular expression.
+                </div>
+                <div class="form-group" *ngIf="!regexValid">
+                    <span class="fa fa-exclamation text-danger"></span> The regular expression is invalid.
+                </div>
+                <div class="form-group" *ngIf='regex != "" && regexValid'>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <button type="button" class="btn btn-block btn-default" (click)="reset(selectedProcess)"><i class="fa fa-remove" ></i> Discard</button>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <button type="button" class="btn btn-success btn-block" (click)="save()" [ladda]='btnLoader.get(0).value'><i class="fa fa-save" ></i> Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
