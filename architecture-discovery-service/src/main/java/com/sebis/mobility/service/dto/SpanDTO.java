@@ -87,6 +87,9 @@ public class SpanDTO {
             this.timestamp = timestamp;
         }
 
+        public AnnotationDTO() {
+        }
+
         public String getKey() {
             return key;
         }
