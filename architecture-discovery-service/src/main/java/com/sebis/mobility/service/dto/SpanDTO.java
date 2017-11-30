@@ -103,7 +103,7 @@ public class SpanDTO {
             this.value = value;
         }
 
-        public long getTimestamp() {
+        public Long getTimestamp() {
             return timestamp;
         }
 

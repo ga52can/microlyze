@@ -24,12 +24,12 @@ public final class SpanMapper {
                         .map(annotation -> new AnnotationDTO(annotation.value, null, annotation.timestamp))
                         .collect(Collectors.toList())
         );
-        /*annotations.addAll(
+        annotations.addAll(
                 source.binaryAnnotations
                         .stream()
-                        .map(annotation -> new AnnotationDTO(annotation.key, annotation.value))
+                        .map(annotation -> new AnnotationDTO(annotation.key, new String(annotation.value), null))
                         .collect(Collectors.toList())
-        );*/
+        );
 
         SpanDTO dto = new SpanDTO();
         dto.setTraceIdHigh(source.traceIdHigh);
