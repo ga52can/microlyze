@@ -12,8 +12,6 @@ import com.sebis.mobility.service.*;
 import com.sebis.mobility.service.component.HardwareService;
 import com.sebis.mobility.service.component.InstanceService;
 import com.sebis.mobility.service.component.ServiceService;
-import com.sebis.mobility.service.dto.SpanDTO;
-import com.sebis.mobility.service.dto.mapper.SpanMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +30,6 @@ import java.net.InetAddress;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Controller
 public class SpanController {
