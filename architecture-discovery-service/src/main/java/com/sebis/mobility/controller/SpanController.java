@@ -55,7 +55,7 @@ public class SpanController {
 
     private StorageComponent zipkinStorageComponent = null;
 
-    private SenderService senderService;
+    private SpanMappingService spanMappingService;
 
     @Autowired
     public SpanController(ServiceService serviceService,
@@ -65,7 +65,7 @@ public class SpanController {
                           RelationService relationService,
                           ComponentMappingService componentMappingService,
                           UnmappedTraceService unmappedTraceService,
-                          SenderService senderService) {
+                          SpanMappingService spanMappingService) {
         this.serviceService = serviceService;
         this.instanceService = instanceService;
         this.hardwareService = hardwareService;
@@ -73,7 +73,7 @@ public class SpanController {
         this.relationService = relationService;
         this.componentMappingService = componentMappingService;
         this.unmappedTraceService = unmappedTraceService;
-        this.senderService = senderService;
+        this.spanMappingService = spanMappingService;
     }
 
     private Map<Long, Span> localComponentSpans = new LinkedHashMap<Long, Span>(1000) {
@@ -418,19 +418,8 @@ public class SpanController {
         return zipkinStorageComponent;
     }
 
-    private void sendToTopic(List<Span> spans) {
-        List<SpanDTO> dtoList = spans
-                .stream()
-                .map(span -> {
-                    SpanDTO dto = SpanMapper.map(span);
-                    if (span.parentId == null) {
-                        String activityLabel = revisionService.findActivityLabelByUrl(span.name);
-                        dto.getAnnotations().add(new SpanDTO.AnnotationDTO("activity", activityLabel, null));
-                    }
-                    return dto;
-                })
-                .collect(Collectors.toList());
-        senderService.sendSpanInfo(dtoList);
+    private void mapSpansAndSave(List<Span> spans) {
+        spanMappingService.mapAndSaveSpans(spans);
     }
 
     // Storage-class which overrides the default storage behaviour of the ZipKin server.
@@ -459,7 +448,7 @@ public class SpanController {
                         System.out.println("SPANS SAVED, START PROCESSING");
                         context.getBean(SpanController.class).proceedSpans(spans);
                         System.out.println("SPANS PROCESSED");
-                        context.getBean(SpanController.class).sendToTopic(spans);
+                        context.getBean(SpanController.class).mapSpansAndSave(spans);
                     }
 
                     @Override
