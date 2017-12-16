@@ -98,7 +98,7 @@ public class RevisionService {
                                 .anyMatch(componentMapping -> {
                                     Pattern pattern = Pattern.compile(componentMapping.getHttpPathRegex());
                                     Matcher matcher = pattern.matcher(url);
-                                    return matcher.matches();
+                                    return matcher.find();
                                 })
                 )
                 .collect(Collectors.toList());
@@ -111,5 +111,4 @@ public class RevisionService {
         }
         return revisions.get(0).getAnnotation("ad.model.label");
     }
-
 }
