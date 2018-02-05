@@ -1,0 +1,33 @@
+
+
+            <div class="animated fadeIn" id="paper" style="flex:1;" [style.overflow]="selectedArchitecture ? 'auto': 'hidden' ">
+                <componentgraph-canvas-component [withActivity]="withActivity"  [style.visibility]="selectedArchitecture ? 'visible': 'hidden' " (onActivityDblClicked)="onModellerActivityDblClicked($event)" (onActivityRemoved)="onModellerActivityRemoved($event)"  (onGraphChanged)="onModellerGraphChanged($event)"
+                    #componentGraphCanvasComponent></componentgraph-canvas-component>
+            </div>
+
+
+
+
+<div bsModal #errorModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-danger" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Error occoured</h4>
+                <button type="button" class="close" (click)="errorModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+            </div>
+            <form ng-submit="renameProcess()" ng-controller="mycontroller">
+                <div class="modal-body">
+                    {{lastErrorMessage}}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="errorModal.hide()">Okay</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->

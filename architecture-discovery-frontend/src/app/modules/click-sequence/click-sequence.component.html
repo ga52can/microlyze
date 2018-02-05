@@ -1,0 +1,199 @@
+<div class="animated fadeIn d-flex flex-row" style="position:absolute; bottom:0px; top:0px; left:30px; right:30px;">
+    <div class="card" style="width:100%; overflow:hidden">
+        <div class="card-block d-flex flex-column">
+            <div class="row headline">
+                <div class="col-md-12">
+                    <h4 class="card-title mb-0">Click Sequence Analyzer</h4>
+                    <div class="small text-muted" *ngIf="selectedProcess">User: {{selectedProcess.label}}</div>
+                </div>
+            </div>
+            <hr class="mb-4" style="margin-left:0px; margin-right:0px; position:relative">
+            <div style="flex:1;" [style.overflow]="selectedProcess ? 'auto': 'hidden' ">
+                <clicksequence-canvas-component  [style.visibility]="selectedProcess ? 'visible': 'hidden' " (onActivityDblClicked)="onModellerActivityDblClicked($event)" (onActivityRemoved)="onModellerActivityRemoved($event)"  (onGraphChanged)="onModellerGraphChanged($event)"
+                    #clicksequenceCanvasComponent></clicksequence-canvas-component>
+                <div style="position: absolute;top: 50%; left:50%; transform: translateX(-50%) translateY(-50%); font-size:30px; color:#ccc" *ngIf="!selectedProcess" >Please select a user </div>
+            </div>
+        </div>
+    </div>
+    <!--/.col-->
+    <div class="card" style="background-color:#fafafa; border-left:none; min-width:330px; max-width:330px;">
+        <div class="card-block" *ngIf="state == EState.FETCHING_ARCHITECTURE">
+          <div class="sk-wave">
+            <div class="sk-rect sk-rect1"></div>
+            <div class="sk-rect sk-rect2"></div>
+            <div class="sk-rect sk-rect3"></div>
+            <div class="sk-rect sk-rect4"></div>
+            <div class="sk-rect sk-rect5"></div>
+          </div>
+          <div style="text-align:center">Fetching User Click Sequence</div>
+        </div>
+        <div class="card-block" *ngIf="state != EState.FETCHING_ARCHITECTURE">
+            <div class="row headline">
+                <div class="col-md-12">
+                    <h4 class="card-title mb-0">User</h4>
+                </div>
+            </div>
+            <hr class="mb-4" style="margin-left:0px; margin-right:0px;">
+            <div class="form-group">
+                <label for="email">Selected User:</label>
+                <select class="form-control" id="ccmonth" [disabled]="saveRequired"  [(ngModel)]="selectedProcess" (change)="setCurrentUser(selectedProcess)">
+                    <option [ngValue]="undefined" selected disabled>Select a user</option>
+                    <option *ngFor="let process of processes" [ngValue]="process">{{process.label}}</option>
+                </select>
+            </div>
+            <div *ngIf="!saveRequired && selectedProcess">
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <button type="button" class="btn btn-block btn-default" (click)="showRenameProcessModal()"><i class="fa fa-edit" ></i> Rename</button>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <button type="button" class="btn btn-danger btn-block" (click)="deleteProcess()" [ladda]='btnLoader.get("DELETE").value'><i class="fa fa-remove" ></i> Delete</button>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" *ngIf="saveRequired">
+                <label for="email"><b>Process model has unsaved changes</b></label>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <button type="button" class="btn btn-block btn-default" (click)="setCurrentProcess(selectedProcess)"><i class="fa fa-remove" ></i> Discard</button>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <button type="button" class="btn btn-success btn-block"  (click)="saveProcess()" [ladda]='btnLoader.get("SAVE").value'><i class="fa fa-save" ></i> Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div bsModal #renameActivityModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Rename Activity</h4>
+                <button type="button" class="close" (click)="renameActivityModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+            </div>
+            <form ng-submit="renameActivity()" ng-controller="mycontroller">
+                <div class="modal-body">
+                    <input class="form-control" type="text" [(ngModel)]="nextRenameActivityName" name="renameActivityValue" #renameActivityInput/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="renameActivityModal.hide()">Close</button>
+                    <input type="submit" class="btn btn-primary" (click)="renameActivity()" value="Rename activity">
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div bsModal #createActivityModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Create Activities</h4>
+                <button type="button" class="close" (click)="createActivityModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+            </div>
+            <form ng-submit="createActivities()">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input class="form-control" type="text" [(ngModel)]="createValues[0].value" name="createValue0" #createActivityInput/>
+                    </div>
+                    <div *ngFor="let value of createValues; let i = index">
+                        <div class="form-group" *ngIf="i > 0">
+                            <input class="form-control" type="text" [(ngModel)]="createValues[i].value" name="createValue{{i}}" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="createActivityModal.hide()">Close</button>
+                    <input type="submit" class="btn btn-primary" (click)="createActivities()" value="Create activities">
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div bsModal #createProcessModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Create Process</h4>
+                <button type="button" class="close" (click)="createProcessModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+            </div>
+            <form ng-submit="createProcess()" ng-controller="mycontroller">
+                <div class="modal-body">
+                    <input class="form-control" type="text" [(ngModel)]="createProcessValue" name="createProcessValue" #createProcessInput/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="createProcessModal.hide()">Close</button>
+                    <input type="submit" class="btn btn-primary" (click)="createProcess()" value="Create process">
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div bsModal #renameProcessModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Rename Process</h4>
+                <button type="button" class="close" (click)="renameProcessModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+            </div>
+            <form ng-submit="renameProcess()" ng-controller="mycontroller">
+                <div class="modal-body">
+                    <input class="form-control" type="text" [(ngModel)]="renameProcessValue" name="renameProcessValue" #renameProcessInput/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="renameProcessModal.hide()">Close</button>
+                    <input type="submit" class="btn btn-primary" (click)="renameProcess()" value="Rename process">
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+
+<div bsModal #errorModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-danger" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Error occoured</h4>
+                <button type="button" class="close" (click)="errorModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+            </div>
+            <form ng-submit="renameProcess()" ng-controller="mycontroller">
+                <div class="modal-body">
+                    {{lastErrorMessage}}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="errorModal.hide()">Okay</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->

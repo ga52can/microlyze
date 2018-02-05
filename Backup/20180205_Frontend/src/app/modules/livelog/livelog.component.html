@@ -1,0 +1,46 @@
+<div class="d-flex flex-row align-items-stretch" style="height:100%">
+    <div class="card flex-column" style="width:100%; margin-right:10px; margin-bottom:0px;">
+        <div class="card-block d-flex flex-column">
+            <div class="row headline">
+                <div class="col-md-12">
+                    <h4 class="card-title mb-0">Architecture LiveLog</h4>
+                </div>
+            </div>
+            <div style="flex:1; overflow: auto; margin-top:20px">
+                <table class="table table-striped" [mfData]="changelogs" [mfSortBy]="'time'" [mfSortOrder]="'desc'" [mfRowsOnPage]="20" #mf="mfDataTable" >
+                    <thead>
+                        <tr>
+                            <th style="width: 25%">
+                                <mfDefaultSorter by="time">Time</mfDefaultSorter>
+                            </th>
+                            <th style="width: 25%">
+                                <mfDefaultSorter by="referenceType">Type</mfDefaultSorter>
+                            </th>
+                            <th style="width: 25%">
+                                <mfDefaultSorter by="operation">Operation</mfDefaultSorter>
+                            </th>
+                            <th style="width: 25%">
+                                <mfDefaultSorter by="referenceId">Id</mfDefaultSorter>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let changelog of mf.data">
+                            <td>{{changelog.time | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                            <td>{{ArchitectureElementType[changelog.referenceType]}}</td>
+                            <td>{{ArchitectureElementOperation[changelog.operation]}}</td>
+                            <td>{{changelog.referenceId}}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4">
+                                <mfBootstrapPaginator [rowsOnPageSet]="[5,10,15,20]"></mfBootstrapPaginator>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
