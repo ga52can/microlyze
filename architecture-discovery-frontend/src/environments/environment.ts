@@ -14,9 +14,9 @@ headers.append('Content-Type', 'application/x-www-form-urlencoded');
 export const environment = {
   production: false,
   livelogWSConnectionString: 'ws://131.159.30.173:2506/?topic=adCMLTopic',
-  discoveryRestAPIBaseURI: 'https://cmlzip2.sebis.in.tum.de/api/v1/ad/',
+  //discoveryRestAPIBaseURI: 'https://cmlzip2.sebis.in.tum.de/api/v1/ad/',
   //discoveryRestAPIBaseURI: 'http://localhost:9413/api/v1/ad/',
-  //discoveryRestAPIBaseURI: 'http://vmmatthes2.informatik.tu-muenchen.de:2505/api/v1/ad/',
+  discoveryRestAPIBaseURI: 'http://vmmatthes2.informatik.tu-muenchen.de:2505/api/v1/ad/',
   headers: headers
 
 

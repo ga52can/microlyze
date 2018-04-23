@@ -25,11 +25,12 @@ export class ComponentGraphCanvasComponent implements OnInit {
     private elementRef: ElementRef;
 
     private graph: joint.dia.Graph;
-    private logicalLinkAttributes: joint.dia.LinkAttributes;
-    private synchronComLinkAttributes: joint.dia.LinkAttributes;
-    private asynchronComLinkAttributes: joint.dia.LinkAttributes;
-    private paperOptions: joint.dia.PaperOptions;
-    private serviceModel: joint.shapes.devs.ModelAttributes;
+    private logicalLinkAttributes: joint.dia.Link.Attributes;
+    private synchronComLinkAttributes: joint.dia.Link.Attributes;
+    private asynchronComLinkAttributes: joint.dia.Link.Attributes;
+    private paperOptions: joint.dia.Paper.Options;
+    //private serviceModel: joint.shapes.devs.ModelAttributes;
+    private serviceModel: Object;
     private instanceModel: joint.shapes.devs.ModelAttributes;
     private hardwareModel: joint.shapes.devs.ModelAttributes;
     private activityModel: joint.shapes.devs.ModelAttributes;
@@ -280,23 +281,19 @@ export class ComponentGraphCanvasComponent implements OnInit {
         let shape = null;
         let name = revision.component.name;
         if (ComponentType[revision.component.type] === 'Activity') {
-          this.activityModel.id = revision.id.toString();
-          name = revision.annotations.get('ad.model.label');
           shape = new joint.shapes.devs.Atomic(this.activityModel);
         } else if (ComponentType[revision.component.type] === 'Hardware') {
-          this.hardwareModel.id = revision.id.toString();
           shape = new joint.shapes.devs.Atomic(this.hardwareModel);
         } else if (ComponentType[revision.component.type] === 'Instance') {
-          this.instanceModel.id = revision.id.toString();
           shape = new joint.shapes.devs.Atomic(this.instanceModel);
         } else {
-          this.serviceModel.id = revision.id.toString();
-          shape = new joint.shapes.devs.Atomic(this.serviceModel);
+          //shape = new joint.shapes.devs.Atomic(this.serviceModel);
         }
         shape.attr('text/text', name);
         shape.set('model.id', revision.id);
         shape.set('model.type', ComponentType[revision.component.type]);
         shape.set('link', 'null');
+        shape.set('id', revision.id.toString());
         this.graph.addCell(shape);
 
         return shape;
@@ -367,7 +364,9 @@ export class ComponentGraphCanvasComponent implements OnInit {
                 groups: {
                     'in': {
                         z: 0,
-                        position: 'top',
+                        position: {
+                            name: 'top'
+                        },
                         attrs: {
                             '.port-body': {
                                 fill: '#16A085',
@@ -377,7 +376,9 @@ export class ComponentGraphCanvasComponent implements OnInit {
                     },
                     'out': {
                         z: 0,
-                        position: 'bottom',
+                        position: {
+                            name: 'bottom'
+                        },
                         attrs: {
                             '.port-body': {
                                 fill: '#E74C3C'

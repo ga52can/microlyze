@@ -9,6 +9,7 @@ import zipkin.storage.mysql.MySQLStorage;
 import javax.sql.DataSource;
 import java.util.concurrent.Executor;
 
+/*
 @Service
 public class UserActivityService {
     private final ApplicationContext context;
@@ -28,3 +29,4 @@ public class UserActivityService {
 
 
 }
+*/

@@ -1,5 +1,6 @@
 package com.sebis.mobility.jpa.domain;
 
+/*
 import com.sebis.mobility.jpa.domain.annotation.Annotation;
 import com.sebis.mobility.jpa.domain.enums.HttpMethod;
 
@@ -56,3 +57,4 @@ public class Spans extends AbstractPersistable {
     }
 }
 
+*/

@@ -1,5 +1,6 @@
 package com.sebis.mobility.jpa.domain;
 
+/*
 import javax.persistence.*;
 
 @Entity
@@ -10,3 +11,4 @@ public class Annotations extends AbstractPersistable {
     @JoinColumn(name = "COMPONENT_ID")
     private Spans spans;
 }
+*/

@@ -19,8 +19,8 @@ export class ClickSequenceCanvasComponent implements OnInit {
     private elementRef: ElementRef;
 
     private graph: joint.dia.Graph;
-    private linkAttributes: joint.dia.LinkAttributes;
-    private paperOptions: joint.dia.PaperOptions;
+    private linkAttributes: joint.dia.Link.Attributes;
+    private paperOptions: joint.dia.Paper.Options;
     private startModel: joint.shapes.devs.ModelAttributes;
     private endModel: joint.shapes.devs.ModelAttributes;
     private activityModel: joint.shapes.devs.ModelAttributes;
