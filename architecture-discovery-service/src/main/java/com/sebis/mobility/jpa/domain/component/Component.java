@@ -2,10 +2,12 @@ package com.sebis.mobility.jpa.domain.component;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.sebis.mobility.jpa.domain.AbstractPersistable;
+import com.sebis.mobility.jpa.domain.ComponentMapping;
 import com.sebis.mobility.jpa.domain.annotation.ComponentAnnotation;
 
 import javax.persistence.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -18,6 +20,9 @@ public class Component extends AbstractPersistable {
     @OneToMany(cascade = CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="component")
     @MapKey(name = "name")
     private Map<String, ComponentAnnotation> annotations = new HashMap<>();
+
+    @OneToMany(cascade = CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="component")
+    private List<ComponentMapping> mappings;
 
     public String getName() {
         return name;
@@ -46,5 +51,9 @@ public class Component extends AbstractPersistable {
             annotation.setComponent(this);
             annotations.put(name, annotation);
         }
+    }
+
+    public List<ComponentMapping> getMappings() {
+        return mappings;
     }
 }
