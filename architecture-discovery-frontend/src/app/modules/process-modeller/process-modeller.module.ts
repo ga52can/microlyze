@@ -4,9 +4,9 @@ import { LocalStorageModule } from 'angular-2-local-storage';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { ModellerComponent } from './modeller.component';
-import { ModellerCanvasComponent } from './modeller-canvas.component';
-import { ModellerRoutingModule } from './modeller-routing.module';
+import { ProcessModellerComponent } from './process-modeller.component';
+import { ProcessModellerCanvasComponent } from './process-modeller-canvas.component';
+import { ProcessModellerRoutingModule } from './process-modeller-routing.module';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { HttpModule, JsonpModule } from '@angular/http';
 import { RevisionService } from "app/services/revision.service";
@@ -17,14 +17,14 @@ import { LaddaModule } from 'angular2-ladda';
 
 @NgModule({
   imports: [
-    ModellerRoutingModule,
+    ProcessModellerRoutingModule,
     ChartsModule,
     ModalModule.forRoot(),
     FormsModule,
     CommonModule,
     LaddaModule
   ],
-  declarations: [ModellerComponent, ModellerCanvasComponent],
+  declarations: [ProcessModellerComponent, ProcessModellerCanvasComponent],
   providers: [
     ArchitectureService,
     ComponentService,
@@ -32,4 +32,4 @@ import { LaddaModule } from 'angular2-ladda';
     ModeledRelationService
   ]
 })
-export class ModellerModule { }
+export class ProcessModellerModule { }

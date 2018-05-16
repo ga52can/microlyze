@@ -2,12 +2,12 @@ import { NgModule } from '@angular/core';
 import { Routes,
      RouterModule } from '@angular/router';
 
-import { ModellerComponent } from './modeller.component';
+import { ProcessModellerComponent } from './process-modeller.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: ModellerComponent,
+    component: ProcessModellerComponent,
     data: {
       title: 'Process Modeller'
     }
@@ -18,4 +18,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class ModellerRoutingModule {}
+export class ProcessModellerRoutingModule {}

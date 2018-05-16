@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import * as joint from 'jointjs';
 import * as jQuery from 'jquery'
 import { ModalDirective } from 'ngx-bootstrap/modal/modal.component';
-import { ModellerCanvasComponent } from './modeller-canvas.component';
+import { ProcessModellerCanvasComponent } from './process-modeller-canvas.component';
 
 import { Revision } from "app/models/revision";
 import { Component } from "app/models/component";
@@ -23,11 +23,11 @@ enum EState {
 };
 
 @ngComponent({
-    templateUrl: 'modeller.component.html'
+    templateUrl: 'process-modeller.component.html'
 })
-export class ModellerComponent implements OnInit {
+export class ProcessModellerComponent implements OnInit {
 
-    @ViewChild('modellerCanvasComponent') modellerCanvasComponent: ModellerCanvasComponent;
+    @ViewChild('modellerCanvasComponent') modellerCanvasComponent: ProcessModellerCanvasComponent;
 
     @ViewChild('createActivityModal') createActivityModal;
     @ViewChild('createActivityInput') createActivityInput;
@@ -40,7 +40,7 @@ export class ModellerComponent implements OnInit {
     @ViewChild('renameProcessInput') renameProcessInput;
     @ViewChild('errorModal') errorModal;
 
-    readonly graphAnnotation: string = "ad.model.graph"
+    readonly graphAnnotation: string = "ad.model.graph";
 
     private nextRenameActivity: joint.shapes.devs.Atomic;
     private nextRenameActivityName: string;
@@ -143,7 +143,7 @@ export class ModellerComponent implements OnInit {
                     delete this.selectedProcess;
                     this.btnLoader.get("DELETE").value = false;
                     this.toasterService.pop('success', 'Process deleted', 'The process and its activities are saved');
-                })
+                });
                 break;
             }
         }
@@ -214,7 +214,7 @@ export class ModellerComponent implements OnInit {
     private saveProcesscreateActivityComponents(cells: Array<joint.dia.Cell>): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             let createRequestCount: number = cells.length;
-            if (createRequestCount == 0)
+            if (createRequestCount === 0)
                 resolve();
 
             for (const cell of cells) {
@@ -224,8 +224,8 @@ export class ModellerComponent implements OnInit {
                 this.revisionService.saveRevision(revision).then(revision => {
                     console.log("ACTIVITY CREATED");
                     this.revisionMap.set(revision.id, revision);
-                    cell.set('model.component.id', revision.component.id)
-                    cell.set('model.revision.id', revision.id)
+                    cell.set('model.component.id', revision.component.id);
+                    cell.set('model.revision.id', revision.id);
                     if ((--createRequestCount) == 0) {
                         resolve();
                     }
