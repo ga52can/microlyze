@@ -8,10 +8,7 @@ import com.sebis.mobility.jpa.domain.component.Hardware;
 import com.sebis.mobility.jpa.domain.component.Instance;
 import com.sebis.mobility.jpa.domain.component.Service;
 import com.sebis.mobility.jpa.domain.enums.HttpMethod;
-import com.sebis.mobility.service.ComponentMappingService;
-import com.sebis.mobility.service.RelationService;
-import com.sebis.mobility.service.RevisionService;
-import com.sebis.mobility.service.UnmappedTraceService;
+import com.sebis.mobility.service.*;
 import com.sebis.mobility.service.component.HardwareService;
 import com.sebis.mobility.service.component.InstanceService;
 import com.sebis.mobility.service.component.ServiceService;
@@ -55,8 +52,17 @@ public class SpanController {
 
     private StorageComponent zipkinStorageComponent = null;
 
+    private SpanMappingService spanMappingService;
+
     @Autowired
-    public SpanController(ServiceService serviceService, InstanceService instanceService, HardwareService hardwareService, RevisionService revisionService, RelationService relationService, ComponentMappingService componentMappingService, UnmappedTraceService unmappedTraceService) {
+    public SpanController(ServiceService serviceService,
+                          InstanceService instanceService,
+                          HardwareService hardwareService,
+                          RevisionService revisionService,
+                          RelationService relationService,
+                          ComponentMappingService componentMappingService,
+                          UnmappedTraceService unmappedTraceService,
+                          SpanMappingService spanMappingService) {
         this.serviceService = serviceService;
         this.instanceService = instanceService;
         this.hardwareService = hardwareService;
@@ -64,6 +70,7 @@ public class SpanController {
         this.relationService = relationService;
         this.componentMappingService = componentMappingService;
         this.unmappedTraceService = unmappedTraceService;
+        this.spanMappingService = spanMappingService;
     }
 
     private Map<Long, Span> localComponentSpans = new LinkedHashMap<Long, Span>(1000) {
@@ -119,7 +126,7 @@ public class SpanController {
             }
 
             // 0.2 if one of the (not binary) endpoints is not valid (== no ip address, happens from time to time, probably a sleuth bug), don't process the span
-            if(!allEndpointsAreValid)
+            if (!allEndpointsAreValid)
                 continue;
 
             //// 1  Create Components
@@ -136,7 +143,7 @@ public class SpanController {
                 String method = "GET";
 
                 for (BinaryAnnotation annotation : span.binaryAnnotations) {
-                    if(annotation.key.toLowerCase().equals("http.method")){
+                    if (annotation.key.toLowerCase().equals("http.method")) {
                         method = new String(annotation.value).toUpperCase();
                     }
                 }
@@ -144,10 +151,10 @@ public class SpanController {
                 // 2.1.1 Create discovered relations between service <-> activities
                 Boolean mappingFound = false;
                 List<ComponentMapping> deprecatedMappings = new ArrayList<>();
-                for(ComponentMapping componentMapping : componentMappingService.findAll()) {
-                    if((componentMapping.getHttpMethods() & HttpMethod.valueOf(method).getValue()) != 0 && Pattern.compile(componentMapping.getHttpPathRegex()).matcher(path).find()) {
+                for (ComponentMapping componentMapping : componentMappingService.findAll()) {
+                    if ((componentMapping.getHttpMethods() & HttpMethod.valueOf(method).getValue()) != 0 && Pattern.compile(componentMapping.getHttpPathRegex()).matcher(path).find()) {
                         Revision activityRevision = revisionService.getCurrentRevisionsByComponentId().get(componentMapping.getComponent().getId());
-                        if(activityRevision != null) {
+                        if (activityRevision != null) {
                             Relation activityRelation = new Relation();
                             activityRelation.setCaller(activityRevision);
                             activityRelation.setCallee(getServiceRevision(srAnnotation.endpoint));
@@ -167,7 +174,7 @@ public class SpanController {
                 }
 
                 // 2.1.2 if a mapping of activity <-> service exists for a activity without current revision (means, the activity was removed from the modeled processes), remove the mapping
-                if(deprecatedMappings.size() > 0)
+                if (deprecatedMappings.size() > 0)
                     componentMappingService.delete(deprecatedMappings);
 
                 // 2.1.3 if a trace could not be mapped, add it to the list of unmappedTraces (only if no other trace with same path was already added)
@@ -207,8 +214,8 @@ public class SpanController {
                 //if the relation is complete (has caller and callee), save it persistently and generate transitive relations (S1 -> S2 and S2-> S3 => S1 -> S3)
                 if (relation.getCaller() != null && relation.getCallee() != null) {
                     incompleteRelations.remove(span.id);
-                    if(span.parentId != null) {
-                        if(!latestRelationsByParent.containsKey(span.parentId))
+                    if (span.parentId != null) {
+                        if (!latestRelationsByParent.containsKey(span.parentId))
                             latestRelationsByParent.put(span.parentId, new LinkedList<>());
                         latestRelationsByParent.get(span.parentId).add(relation);
                         proceedLocalComponentForRelation(span.parentId, relation);
@@ -217,12 +224,12 @@ public class SpanController {
                     relation.setOwner(relation.getCaller());
                     addTransactionRelation(relation, span);
                 }
-            // Store local components
+                // Store local components
             } else {
                 for (BinaryAnnotation annotation : span.binaryAnnotations) {
-                    if(annotation.key.toLowerCase().equals("lc")) {
+                    if (annotation.key.toLowerCase().equals("lc")) {
                         localComponentSpans.put(span.id, span);
-                        if(latestRelationsByParent.containsKey(span.id)) {
+                        if (latestRelationsByParent.containsKey(span.id)) {
                             for (Relation relation : latestRelationsByParent.get(span.id)) {
                                 proceedLocalComponentForRelation(span.id, relation);
                             }
@@ -235,10 +242,10 @@ public class SpanController {
     }
 
     private void proceedLocalComponentForRelation(Long spanId, Relation relation) {
-        if(spanId  !=  null ) {
+        if (spanId != null) {
             Span span = localComponentSpans.get(spanId);
-            if(span != null) {
-                for(BinaryAnnotation lcAnnotation : span.binaryAnnotations) {
+            if (span != null) {
+                for (BinaryAnnotation lcAnnotation : span.binaryAnnotations) {
                     if (lcAnnotation.key.toLowerCase().equals("thread")) {
                         relation.setAnnotation("ad.async", "true");
                     }
@@ -256,11 +263,11 @@ public class SpanController {
             relation = relationsToCheck.get(0);
 
             // if the id is null, its uncertainly, if the relation already exists, checking against the object-repository required
-            if(relation.getId() == null) {
+            if (relation.getId() == null) {
                 Relation existingRelation = relationService.findByOwnerAndCallerAndCallee(relation.getOwner(), relation.getCaller(), relation.getCallee());
 
                 // the relation exists already and is not new discovered. So use the found relation-object for further processing and add newly discovered annotations
-                if(existingRelation != null) {
+                if (existingRelation != null) {
                     // Todo: Check if there are really new annotations and if not, dont update/save the object! (many wrong update-Changelogs because of useless object-updates without changes)
                     existingRelation.setAnnotations(relation.getAnnotations());
                     relation = existingRelation;
@@ -268,7 +275,7 @@ public class SpanController {
                 relation = relationService.saveRelation(relation);
             }
             // if the id is not null, this relation is already persistently stored,
-            else if(relation.annotationsRequireSave())
+            else if (relation.annotationsRequireSave())
                 relation = relationService.saveRelation(relation);
 
             relations.add(relation);
@@ -289,12 +296,10 @@ public class SpanController {
             if (currentRelation.getCaller().getId().equals(relation.getCallee().getId())) {
                 topRelation = relation;
                 bottomRelation = currentRelation;
-            }
-            else if (relation.getCaller().getId().equals(currentRelation.getCallee().getId())) {
+            } else if (relation.getCaller().getId().equals(currentRelation.getCallee().getId())) {
                 topRelation = currentRelation;
                 bottomRelation = relation;
-            }
-            else
+            } else
                 continue;
 
             Relation newRelation = new Relation();
@@ -337,7 +342,7 @@ public class SpanController {
         String serviceName = endpoint.serviceName.toUpperCase();
         String hardwareName = getHardwareName(endpoint);
         String instanceName = getInstanceName(endpoint);
-        if(instanceName.equals("unknown"))
+        if (instanceName.equals("unknown"))
             return false;
 
         if (!componentRevisionMap.containsKey(serviceName)) {
@@ -345,8 +350,7 @@ public class SpanController {
             Service service = serviceService.findByName(serviceName);
             if (service == null) {
                 serviceService.createService(serviceName);
-            }
-            else
+            } else
                 revisionService.createRevision(service);
         }
 
@@ -365,11 +369,10 @@ public class SpanController {
             Instance instance = instanceService.findByName(instanceName);
             if (instance == null) {
                 instance = instanceService.createInstance(instanceName);
-                instance.setAnnotation("ad.port", endpoint.port.toString() );
+                instance.setAnnotation("ad.port", endpoint.port.toString());
                 instance.setAnnotation("ad.ip", getHardwareName(endpoint));
                 instanceService.saveInstance(instance);
-            }
-            else
+            } else
                 revisionService.createRevision(instance);
 
             Revision instanceRevision = componentRevisionMap.get(instanceName);
@@ -412,6 +415,9 @@ public class SpanController {
         return zipkinStorageComponent;
     }
 
+    private void mapSpansAndSave(List<Span> spans) {
+        spanMappingService.mapAndSaveSpans(spans);
+    }
 
     // Storage-class which overrides the default storage behaviour of the ZipKin server.
     // Behaves like a extended Zipkin-Mysql-Storage by being a proxy.
@@ -439,6 +445,7 @@ public class SpanController {
                         System.out.println("SPANS SAVED, START PROCESSING");
                         context.getBean(SpanController.class).proceedSpans(spans);
                         System.out.println("SPANS PROCESSED");
+                        context.getBean(SpanController.class).mapSpansAndSave(spans);
                     }
 
                     @Override

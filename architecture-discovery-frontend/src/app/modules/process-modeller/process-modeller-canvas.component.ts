@@ -7,9 +7,9 @@ import * as backbone from 'backbone';
 
 @Component({
     template: '<div id="paper"></div>',
-    selector: 'modeller-canvas-component'
+    selector: 'process-modeller-canvas-component'
 })
-export class ModellerCanvasComponent implements OnInit {
+export class ProcessModellerCanvasComponent implements OnInit {
 
     @Output() onActivityDblClicked = new EventEmitter<joint.shapes.devs.Atomic>();
     @Output() onActivityRemoved = new EventEmitter<joint.shapes.devs.Atomic>();

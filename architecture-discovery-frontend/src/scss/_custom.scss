@@ -170,10 +170,10 @@ table.dependency-matrix {
     td:hover::after,
     thead th:not(:empty):hover::after {
         content: '';
-        height: 10000px;
+        height: 2000px;
         left: 0;
         position: absolute;
-        top: -5000px;
+        top: -1000px;
         width: 100%;
         z-index: -1;
     }

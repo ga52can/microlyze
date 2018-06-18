@@ -26,8 +26,8 @@ export const routes: Routes = [
         loadChildren: './modules/livelog/livelog.module#LivelogModule'
       },
       {
-        path: 'modeller',
-        loadChildren: './modules/modeller/modeller.module#ModellerModule'
+        path: 'process-modeller',
+        loadChildren: './modules/process-modeller/process-modeller.module#ProcessModellerModule'
       },
       {
         path: 'activity-mapper',

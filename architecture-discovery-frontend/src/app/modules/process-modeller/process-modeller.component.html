@@ -28,8 +28,8 @@
             </div>
             <hr class="mb-4" style="margin-left:0px; margin-right:0px; position:relative">
             <div style="flex:1;" [style.overflow]="selectedProcess ? 'auto': 'hidden' ">
-                <modeller-canvas-component  [style.visibility]="selectedProcess ? 'visible': 'hidden' " (onActivityDblClicked)="onModellerActivityDblClicked($event)" (onActivityRemoved)="onModellerActivityRemoved($event)"  (onGraphChanged)="onModellerGraphChanged($event)"
-                    #modellerCanvasComponent></modeller-canvas-component>
+                <process-modeller-canvas-component  [style.visibility]="selectedProcess ? 'visible': 'hidden' " (onActivityDblClicked)="onModellerActivityDblClicked($event)" (onActivityRemoved)="onModellerActivityRemoved($event)"  (onGraphChanged)="onModellerGraphChanged($event)"
+                    #modellerCanvasComponent></process-modeller-canvas-component>
                 <div style="position: absolute;top: 50%; left:50%; transform: translateX(-50%) translateY(-50%); font-size:30px; color:#ccc" *ngIf="!selectedProcess" >Please select a process to start modelling</div>
             </div>
         </div>
