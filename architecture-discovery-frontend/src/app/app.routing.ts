@@ -18,6 +18,10 @@ export const routes: Routes = [
     },
     children: [
       {
+        path: '',
+        loadChildren: './modules/dashboard/dashboard.module#DashboardModule'
+      },
+      {
         path: 'livelog',
         loadChildren: './modules/livelog/livelog.module#LivelogModule'
       },

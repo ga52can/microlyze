@@ -1,0 +1,18 @@
+<h1>Enterprise View</h1>
+<div class="animated fadeIn">
+  <div class="row">
+    <div class="col-sm-6 col-md-4" *ngFor="let domain of domains">
+      <div class="card">
+        <div class="card-header">
+          {{domain.name}}
+        </div>
+        <div class="card-block">
+          <div class="product" *ngFor="let product of domain.products">
+            {{product.name}}
+          </div>
+        </div>
+      </div>
+    </div><!--/.col-->
+  </div>
+</div>
+

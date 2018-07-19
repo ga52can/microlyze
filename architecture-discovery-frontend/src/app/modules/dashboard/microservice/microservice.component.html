@@ -1,0 +1,88 @@
+<div class="animated fadeIn">
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-block">
+          <div class="row">
+            <div class="col-sm-5">
+              <h4 class="card-title mb-0" (mouseenter)="highlightNode(component)" (mouseleave)="highlightNodeOff(component)" >{{component && component.name}}</h4>
+            </div>
+            <div class="col-sm-7" style="text-align:right">
+              <button type="button" class="btn btn-outline-primary" (click)="routeParent()">
+                <i class="icon-arrow-up-circle"></i>&nbsp;
+                {{component.parent ? componentService.getComponentById(component.parent).name : 'Enterprise View'}}
+              </button>
+              <button type="button" class="btn btn-outline-primary" (click)="resetZoom()" ><i class="icon-frame"></i></button>
+              <button type="button" class="btn btn-outline-primary" (click)="exportGraph()" ><i class="icon-cloud-download"></i></button>
+            </div>
+          </div>
+          <hr class="mb-4">
+          <div class="chart-wrapper">
+            <div id="cy">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!--/.col-->
+
+    <div class="col-md-4">
+      <!--
+      <div class="card">
+        <div class="card-block">
+          <h4 class="card-title mb-0">Statistics</h4>
+          <hr class="mb-4">
+          <div>
+
+            <div class="progress progress-xs mt-2 mb-3">
+              <div class="progress-bar bg-info" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+            </div></div>
+        </div>
+      </div>
+    -->
+      <div class="card" *ngIf="component.type == componentType.Domain">
+        <div class="card-block">
+          <h4 class="card-title mb-0">Settings</h4>
+          <hr class="mb-4">
+          <label class="switch switch-3d switch-primary">
+            <input type="checkbox" class="switch-input" [(ngModel)]="graphSettings.serviceRelations" (ngModelChange)="domainView()"/>
+            <span class="switch-label"></span>
+            <span class="switch-handle"></span>
+          </label>
+          Aggregate Relations on <i>Product level</i>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-block">
+          <h4 class="card-title mb-0">Entities</h4>
+          <div *ngFor="let group of entities">
+              <hr class="mb-4">
+            <h6>{{group.name}}</h6>
+            <div *ngFor="let entity of group.entities">
+              <a routerLinkActive="active" [routerLink]="['/service', entity.id]" (mouseenter)="highlightNode(entity)" (mouseleave)="highlightNodeOff(entity)" >{{entity.name}}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card" *ngIf="component.type == componentType.Service && instances.length">
+        <div class="card-block">
+          <h4 class="card-title mb-0">Instances</h4>
+          <hr class="mb-4">
+          <div *ngFor="let instance of instances">
+
+            {{instance.hostName}}:{{instance.port}} ({{instance.ipAddr}})
+            <span class="font-weight-bold float-right">{{instance.address}}</span>
+            <ngx-json-viewer [json]="instance" [expanded]="false"></ngx-json-viewer>
+          </div>
+        </div>
+      </div>
+      <div class="card" *ngIf="component.type == componentType.Service">
+        <div class="card-block">
+          <h4 class="card-title mb-0">API</h4>
+          <hr class="mb-4">
+          <!--<pre>{{component | json}}</pre>-->
+          <ngx-json-viewer [json]="api" [expanded]="false"></ngx-json-viewer>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
