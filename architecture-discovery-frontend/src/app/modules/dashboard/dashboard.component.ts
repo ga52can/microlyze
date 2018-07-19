@@ -83,6 +83,8 @@ export class DashboardComponent implements OnInit {
     // remove edges targeting their source and remove duplicate edges
     console.log(edges);
     cytoscape.use( dagre );
+    this.cy = cytoscape;
+    /*
     this.cy = cytoscape({
       container: document.getElementById('cy'),
       elements: {
@@ -137,6 +139,7 @@ export class DashboardComponent implements OnInit {
     ]
     });
     this.cy.on('tap', 'node', event => this.router.navigate(['/service', event.target.id()]));
+    */
   }
 
   ngOnInit(): void {
