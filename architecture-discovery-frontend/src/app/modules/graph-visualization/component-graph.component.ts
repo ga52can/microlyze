@@ -2,7 +2,6 @@ import {Component as ngComponent, Input, OnInit, ViewChild} from '@angular/core'
 import { Router } from '@angular/router';
 import * as joint from 'jointjs';
 import * as jQuery from 'jquery'
-import { ModalDirective } from 'ngx-bootstrap/modal/modal.component';
 import { ComponentGraphCanvasComponent } from './component-graph-canvas.component';
 
 import { Revision } from 'app/models/revision';
@@ -59,6 +58,7 @@ export class ComponentGraphComponent implements OnInit {
     private nextRenameActivityName: string;
     private createValues: Array<StringObject> = new Array<StringObject>(new StringObject());
     private createCount = 1;
+    private consideredLayerTypes: Array<ComponentType> = [ComponentType.Domain, ComponentType.Service, ComponentType.Instance, ComponentType.Database, ComponentType.Hardware];
 
     private lastErrorMessage: string;
 
@@ -86,7 +86,7 @@ export class ComponentGraphComponent implements OnInit {
     }
 
     private fetchArchitecture(): void {
-        this.architectureService.getArchitecture(this.fetchedSnapshot, RelationFilter.CHILDREN).subscribe((architecture) => {
+        this.architectureService.getArchitecture(this.fetchedSnapshot, RelationFilter.CHILDREN, null, this.consideredLayerTypes).subscribe((architecture) => {
 
           //this.componentGraphCanvasComponent.initGraph((this.selectedArchitecture) ? JSON.parse(this.selectedArchitecture) : null);
           this.selectedArchitecture = true;

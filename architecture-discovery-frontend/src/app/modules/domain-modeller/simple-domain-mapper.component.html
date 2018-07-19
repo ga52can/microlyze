@@ -3,21 +3,21 @@
         <div class="card-block d-flex flex-column">
             <div class="row headline">
                 <div class="col-md-12">
-                    <h4 class="card-title mb-0">Unmapped paths</h4>
+                    <h4 class="card-title mb-0">Unmapped services</h4>
                 </div>
             </div>
             <hr class="mb-4" style="margin-left:0px; margin-right:0px; position:relative">
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                <input type="text" class="form-control" placeholder="Filter by path" [(ngModel)]="filterQuery"/>
+                <input type="text" class="form-control" placeholder="Filter by name" [(ngModel)]="filterQuery"/>
             </div>
             <div style="position:absolute; bottom:0px; top:136px; left:20px; right:20px; overflow-y: auto">
                 <div style="position: absolute;top: 50%; text-align:center; width:100%; transform: translateY(-50%); font-size:30px; color:#ccc"
-                    *ngIf="unmappedTraces.length == 0">No unmapped paths available</div>
+                    *ngIf="unmappedServices.length == 0">No unmapped services available</div>
                 <div class="list-group list-striped">
-                    <a *ngFor="let trace of getNotSelectedTraces()" (click)="onSelectTrace(trace)" class="list-group-item list-group-item-action flex-column align-items-start">
-                        <p class="mb-1">{{trace.httpPath}}</p>
-                        <span><span class="badge badge-default">{{HttpMethod[trace.httpMethod]}}</span> <small> first seen: {{trace.time | date:'yyyy-MM-dd HH:mm:ss'}}</small></span>
+                    <a *ngFor="let service of getNotSelectedServices()" (click)="onSelectService(service)" class="list-group-item list-group-item-action flex-column align-items-start">
+                        <p class="mb-1">{{service.component.name}}</p>
+                        <span><small> first seen: {{service.component.getAnnotation('ad.discovered_at') | date:'yyyy-MM-dd HH:mm:ss'}}</small></span>
                     </a>
                 </div>
             </div>
@@ -27,17 +27,17 @@
         <div class="card-block d-flex flex-column">
             <div class="row headline">
                 <div class="col-md-12">
-                    <h4 class="card-title mb-0">Selected paths</h4>
+                    <h4 class="card-title mb-0">Selected Services</h4>
                 </div>
             </div>
             <hr class="mb-4" style="margin-left:0px; margin-right:0px; position:relative">
             <div style="position:absolute; bottom:0px; top:90px; left:20px; right:20px; overflow-y: auto">
                 <div style="position: absolute;top: 50%; text-align:center; width:100%; transform: translateY(-50%); font-size:30px; color:#ccc"
-                    *ngIf="unmappedTraces.length > 0 && selectedTraces.length <= 0">Select path(s) from the left list</div>
+                    *ngIf="unmappedServices.length > 0 && selectedServices.length <= 0">Select Services from the left list</div>
                 <div class="list-group list-striped">
-                    <a *ngFor="let trace of getSelectedTraces()" (click)="onDeselectTrace(trace)" class="list-group-item list-group-item-action flex-column align-items-start">
-                        <p class="mb-1">{{trace.httpPath}}</p>
-                        <span><span class="badge badge-default">{{HttpMethod[trace.httpMethod]}}</span> <small> first seen: {{trace.time | date:'yyyy-MM-dd HH:mm:ss'}}</small></span>
+                    <a *ngFor="let service of getSelectedServices()" (click)="onDeselectService(service)" class="list-group-item list-group-item-action flex-column align-items-start">
+                        <p class="mb-1">{{service.component.name}}</p>
+                        <span><small> first seen: {{service.component.getAnnotation('ad.discovered_at') | date:'yyyy-MM-dd HH:mm:ss'}}</small></span>
                     </a>
                 </div>
             </div>
@@ -52,36 +52,29 @@
                 <div class="sk-rect sk-rect4"></div>
                 <div class="sk-rect sk-rect5"></div>
             </div>
-            <div style="text-align:center">Fetching Processes</div>
+            <div style="text-align:center">Fetching Domains</div>
         </div>
         <div class="card-block" *ngIf="true">
             <div class="row headline">
                 <div class="col-md-12">
-                    <h4 class="card-title mb-0">Assign paths to activity</h4>
+                    <h4 class="card-title mb-0">Assign Services to Domains</h4>
                 </div>
             </div>
             <hr class="mb-4" style="margin-left:0px; margin-right:0px;">
             <div class="form-group">
-                <label for="email">Selected Process:</label>
-                <select class="form-control" id="ccmonth" [(ngModel)]="selectedProcess" (change)="unsetSelectedActivity()">
-                            <option [ngValue]="undefined" selected disabled>Select a process</option>
-                            <option *ngFor="let process of processes" [ngValue]="process">{{process.label}}</option>
+                <label for="email">Selected Domain:</label>
+                <select class="form-control" id="ccmonth" [(ngModel)]="selectedDomain">
+                            <option [ngValue]="undefined" selected disabled>Select a Domain</option>
+                            <option *ngFor="let domain of domains" [ngValue]="domain">{{domain.component.name}}</option>
                         </select>
             </div>
-            <div class="form-group" *ngIf="selectedProcess">
-                <label for="email">Selected Activity:</label>
-                <select class="form-control" id="ccmonth" [(ngModel)]="selectedActivity">
-                            <option [ngValue]="undefined" selected disabled>Select a Activity</option>
-                            <option *ngFor="let activity of activityMap.get(selectedProcess.id)" [ngValue]="activity">{{activity.label}}</option>
-                        </select>
+            <div class="form-group" *ngIf="selectedService && selectedServices.length <= 0">
+                <span class="fa fa-exclamation text-danger"></span> Select Services to assign them to Domains.
             </div>
-            <div class="form-group" *ngIf="selectedActivity && selectedTraces.length <= 0">
-                <span class="fa fa-exclamation text-danger"></span> Select paths to assign them to the selected activity.
-            </div>
-            <div class="form-group" *ngIf="selectedActivity && selectedTraces.length > 0">
+            <div class="form-group" *ngIf="selectedDomain && selectedServices.length > 0">
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <button type="button" class="btn btn-block btn-default" (click)="reset(selectedProcess)"><i class="fa fa-remove" ></i> Discard</button>
+                        <button type="button" class="btn btn-block btn-default" (click)="reset(selectedDomain)"><i class="fa fa-remove" ></i> Discard</button>
                     </div>
                     <div class="form-group col-md-6">
                         <button type="button" class="btn btn-success btn-block" (click)="save()" [ladda]="btnLoader.get(0).value"><i class="fa fa-save" ></i> Save</button>

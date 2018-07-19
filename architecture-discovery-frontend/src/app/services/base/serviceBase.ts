@@ -3,7 +3,7 @@ import {
   HttpEvent,
   HttpInterceptor,
   HttpHandler,
-  HttpRequest,
+  HttpRequest, HttpHeaders,
 } from '@angular/common/http';
 import {Observable} from "rxjs/Observable";
 //import { HttpClient } from '@angular/common/http';
@@ -11,9 +11,12 @@ import { environment } from "environments/environment";
 import {Injectable} from "@angular/core";
 
 export class ServiceBase {
-  constructor(protected http: HttpClient) { }
   protected apiUrl = environment.discoveryRestAPIBaseURI;
-  protected headers = environment.headers;
+  public headers = new HttpHeaders();
+
+  constructor(protected http: HttpClient) {
+    this.headers.append('Content-Type', 'application/json;charset=utf-8');
+  }
 }
 
 /*

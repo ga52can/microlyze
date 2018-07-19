@@ -10,6 +10,7 @@ import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -55,6 +56,7 @@ public class ComponentBaseService<T extends Component> {
 
     protected T createComponent(T component, String name) {
         component.setName(name);
+        component.setAnnotation("ad.discovered_at", String.valueOf(new Date().getTime()));
         component = saveComponent(component);
         revisionService.createRevision(component);
         return component;

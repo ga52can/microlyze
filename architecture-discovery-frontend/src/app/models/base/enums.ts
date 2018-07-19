@@ -1,5 +1,9 @@
 export enum ComponentType {
-    Process, Activity, Service, Instance, Hardware
+    Domain, Product, Process, Activity, Database, Service, Instance, Hardware
+}
+
+export enum ComponentTypeAbbr {
+  D, Pr, P, A, DB, S, I, H
 }
 
 export enum ArchitectureElementType {

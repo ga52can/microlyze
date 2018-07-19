@@ -148,7 +148,6 @@ export class ClickSequenceCanvasComponent implements OnInit {
             ports: {
                 groups: {
                     'in': {
-                        z: 0,
                         label: {
                           position: 'top',
                         },
@@ -160,7 +159,6 @@ export class ClickSequenceCanvasComponent implements OnInit {
                         }
                     },
                     'out': {
-                        z: 0,
                         label: {
                           position: 'bottom',
                         },
@@ -191,7 +189,6 @@ export class ClickSequenceCanvasComponent implements OnInit {
             ports: {
                 groups: {
                     'out': {
-                        z: 0,
                         label: {
                           position: 'bottom',
                         },
@@ -217,7 +214,6 @@ export class ClickSequenceCanvasComponent implements OnInit {
             ports: {
                 groups: {
                     'in': {
-                        z: 0,
                         label: {
                           position: 'top',
                         },

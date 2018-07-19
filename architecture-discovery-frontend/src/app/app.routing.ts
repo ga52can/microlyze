@@ -22,6 +22,10 @@ export const routes: Routes = [
         loadChildren: './modules/livelog/livelog.module#LivelogModule'
       },
       {
+        path: 'domain-modeller',
+        loadChildren: './modules/domain-modeller/domain-mapper.module#DomainMapperModule'
+      },
+      {
         path: 'process-modeller',
         loadChildren: './modules/process-modeller/process-modeller.module#ProcessModellerModule'
       },

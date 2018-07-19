@@ -1,19 +1,19 @@
 import { AnnotationBase } from "app/models/base/annotationBase";
 
 export class Relation extends AnnotationBase {
-	private _id: number;
+	  private _id: number;
     private _owner: number;
     private _caller: number;
     private _callee: number;
 
     public static deserialize(object: any): Relation {
-        let relation: Relation = new Relation();
-		relation.deserializeAnnotations(object);
-        relation._owner = object.owner;
-        relation._caller = object.caller;
-        relation._callee = object.callee;
-		relation._id = object.id;
-        return relation;
+      let relation: Relation = new Relation();
+      relation.deserializeAnnotations(object);
+      relation._owner = object.owner;
+      relation._caller = object.caller;
+      relation._callee = object.callee;
+      relation._id = object.id;
+      return relation;
     }
 
 	public get id(): number {

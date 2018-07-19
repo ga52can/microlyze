@@ -212,25 +212,36 @@ table.dependency-matrix {
     }
 }
 
+.cmptype-Domain{
+  background-color: #99D3DF !important;
+  color:#fff;
+}
 
+//obsolete
 .cmptype-Process{
     background-color: #99D3DF !important;
     color:#fff;
 }
 
+//obsolete
 .cmptype-Activity{
     background-color: #88BBD6 !important;
     color:#fff;
 }
 
 .cmptype-Service {
-    background-color: #849dbd !important;
+    background-color: #88BBD6 !important;
     color:#fff;
 }
 
 .cmptype-Instance {
-    background-color: #CDCDCD !important;
+    background-color: #849dbd !important;
     color:#000;
+}
+
+.cmptype-Database{
+  background-color: #00a67c !important;
+  color:#fff;
 }
 
 .cmptype-Hardware {
@@ -249,7 +260,9 @@ table.pop-table {
     td {
 
         padding: 0px 10px;
-        white-space: nowrap;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 330px;
     }
 }
 

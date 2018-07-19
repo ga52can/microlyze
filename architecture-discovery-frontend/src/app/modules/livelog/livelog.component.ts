@@ -3,10 +3,9 @@ import { Component as ngComponent, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import * as joint from 'jointjs';
 import * as jQuery from 'jquery'
-import { ModalDirective } from 'ngx-bootstrap/modal/modal.component';
 import { ChangelogService } from "app/services/changelog.service";
 import { Changelog } from "app/models/changelog";
-import { ArchitectureElementType,ArchitectureElementOperation } from "app/models/base/enums";
+import { ArchitectureElementType, ArchitectureElementOperation } from "app/models/base/enums";
 
 
 @ngComponent({

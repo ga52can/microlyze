@@ -6,7 +6,6 @@ import { Component as ngComponent, OnInit, ViewChild, Input } from '@angular/cor
 import { Router } from '@angular/router';
 import * as joint from 'jointjs';
 import * as jQuery from 'jquery'
-import { ModalDirective } from 'ngx-bootstrap/modal/modal.component';
 import { ComponentMappingService } from "app/services/component-mapping.service";
 import { UnmappedTrace } from "app/models/unmapped-trace";
 import { Revision } from "app/models/revision";
@@ -27,7 +26,7 @@ export class SimpleMapperComponent implements OnInit {
     @Input() private processes: Array<Revision>;
     @Input() private activityMap: Map<number, Array<Revision>>;
 
-    private selectedTraces: Array<UnmappedTrace> = new Array();    
+    private selectedTraces: Array<UnmappedTrace> = new Array();
     private selectedProcess: Revision;
     private selectedActivity: Revision;
     private filterQuery: string = "";

@@ -31,8 +31,8 @@ public class ArchitectureDiscoveryService {
             try {
                 context.getBean(RegistryController.class).eurekaCall();
             } catch (Exception ex ) {
-                ex.printStackTrace();
-                log.error(ex.getMessage());
+                //ex.printStackTrace();
+                //log.error(ex.getMessage());
             }
         },00 , 2, SECONDS);
     }

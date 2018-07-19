@@ -1,114 +1,132 @@
-
-
-            <hr class="mb-4" style="margin-left:0px; margin-right:0px; position:relative">
-            <div style="flex:1;" *ngIf="!btnLoader.get('FETCH').value && loadedArchitecture == null">
-                <div style="position: absolute;top: 50%; width:100%; text-align:center; transform: translateY(-50%); font-size:30px; color:#ccc"
-                    *ngIf="!selectedProcess">Press "Fetch architecture" on the right</div>
+<div style="flex:1;" *ngIf="!btnLoader.get('FETCH').value && loadedArchitecture == null">
+    <div style="position: absolute;top: 50%; width:100%; text-align:center; transform: translateY(-50%); font-size:30px; color:#ccc"
+        *ngIf="!selectedProcess">Press "Fetch architecture" on the right</div>
+</div>
+<div style="flex:1;" *ngIf="btnLoader.get('FETCH').value">
+    <div style="position: absolute;top: 50%; width:100%; text-align:center; transform: translateY(-50%); font-size:30px; color:#ccc"
+        *ngIf="!selectedProcess">
+        <div class="card-block">
+            <div class="sk-wave">
+                <div class="sk-rect sk-rect1"></div>
+                <div class="sk-rect sk-rect2"></div>
+                <div class="sk-rect sk-rect3"></div>
+                <div class="sk-rect sk-rect4"></div>
+                <div class="sk-rect sk-rect5"></div>
             </div>
-            <div style="flex:1;" *ngIf="btnLoader.get('FETCH').value">
-                <div style="position: absolute;top: 50%; width:100%; text-align:center; transform: translateY(-50%); font-size:30px; color:#ccc"
-                    *ngIf="!selectedProcess">
-                    <div class="card-block">
-                        <div class="sk-wave">
-                            <div class="sk-rect sk-rect1"></div>
-                            <div class="sk-rect sk-rect2"></div>
-                            <div class="sk-rect sk-rect3"></div>
-                            <div class="sk-rect sk-rect4"></div>
-                            <div class="sk-rect sk-rect5"></div>
-                        </div>
-                        <div style="text-align:center">Fetching architecture...</div>
-                    </div>
-                </div>
+            <div style="text-align:center">Fetching architecture...</div>
+        </div>
+    </div>
+</div>
+<div style="position:absolute; left:0px; right:0px; top:75px; text-align:center; font-size:20px; color: #ccc">Successors -> </div>
+<div style="position:absolute; top:50%; bottom:0px; left:0px; font-size:20px; color: #ccc;"><div style="margin-left:-50px; transform: rotate(-90.0deg);">&lt;- Predecessors</div></div>
+<div *ngIf="dependencyMatrixData != null" style="overflow:auto;margin-top:20px; margin-left:24px; position:relative;" class="dependency-matrix-container">
+    <table class="dependency-matrix table table-bordered">
+        <thead>
+            <tr class="mrow">
+                <th class="invisible-cell" style="border-right:1px solid white"></th>
+                <th class="invisible-cell mcol"></th>
+                <th *ngFor="let revision of dependencyMatrixData.revisions; let colIndex = index" [ngClass]="['mcol', 'cmptype-' + ComponentType[revision.component.type]]">{{(ComponentType[revision.component.type])| truncate : 1}}{{dependencyMatrixData.typeIndex[colIndex]}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="mrow">
+                <th></th>
+                <th class="mcol"></th>
+                <th class="mcol" *ngFor="let count of dependencyMatrixData.revisions">
+                </th>
+            </tr>
+            <tr *ngFor="let row of dependencyMatrixData.matrix; let rowIndex=index" class="mrow">
+                <th class="legend" [tooltip]="dependencyMatrixData.labels[rowIndex]" container="body">
+                    <span>{{dependencyMatrixData.labels[rowIndex]}}</span>
+                </th>
+                <th [ngClass]="['cmptype-col', 'cmptype-' + ComponentType[dependencyMatrixData.revisions[rowIndex].component.type]]">
+                    {{(ComponentType[dependencyMatrixData.revisions[rowIndex].component.type])| truncate : 1}}{{dependencyMatrixData.typeIndex[rowIndex]}}
+                </th>
+                <ng-container *ngFor="let relationData of row; let colIndex=index">
+                    <td *ngIf="relationData">
+
+                        <button style="width:100%; background: transparent; outline: none; border:none" *ngIf="relationData.ownerLabel == relationData.callerLabel" (click)="setSelectedRelationData(relationData); openAnnotationModal(relationAnnotationModal)">x</button>
+                        <button style="width:100%; background: transparent; outline: none; border:none; color: #aaa" [popover]="popTemplate" popoverTitle="Relation Details"
+                            placement="right" container="body" triggers="focus" *ngIf="relationData.ownerLabel != relationData.callerLabel && showIndirectRelations">x</button>
+                    </td>
+                    <td *ngIf="!relationData && colIndex == rowIndex">
+                        -
+                    </td>
+                    <td *ngIf="!relationData && colIndex != rowIndex">
+                    </td>
+
+                </ng-container>
+            </tr>
+            <tbody>
+    </table>
+</div>
+
+<ng-template #relationAnnotationModal>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Relation Annotation</h4>
+        <button type="button" class="close" (click)="modalRef.hide()" aria-label="Abbruch">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="pop-table">
+          <tr>
+            <th style="font-weight:normal">{{selectedRelationData.ownerTypeLabel}}</th>
+            <td style="font-weight:bold">{{selectedRelationData.ownerLabel}}</td>
+          </tr>
+          <tr>
+            <th></th>
+            <td>{{selectedRelationData.dependencyText}}</td>
+          </tr>
+          <tr>
+            <th style="font-weight:normal">{{selectedRelationData.calleeTypeLabel}}</th>
+            <td style="font-weight:bold">{{selectedRelationData.calleeLabel}}</td>
+          </tr>
+          <tr *ngIf="selectedRelationData.callerLabel != selectedRelationData.ownerLabel">
+            <th style="font-weight:normal"></th>
+            <td>because of</td>
+          </tr>
+          <tr *ngIf="selectedRelationData.callerLabel != selectedRelationData.ownerLabel">
+            <th style="font-weight:normal">{{selectedRelationData.callerTypeLabel}}</th>
+            <td>{{selectedRelationData.callerLabel}}</td>
+          </tr>
+          <tr>
+            <div id="paper">
+              <relation-dependency-canvas-component #relationDependencyCanvasComponent></relation-dependency-canvas-component>
             </div>
-            <div style="position:absolute; left:0px; right:0px; top:75px; text-align:center; font-size:20px; color: #ccc">Successors -> </div>
-            <div style="position:absolute; top:50%; bottom:0px; left:0px; font-size:20px; color: #ccc;"><div style="margin-left:-50px; transform: rotate(-90.0deg);">&lt;- Predecessors</div></div>
-            <div *ngIf="dependencyMatrixData != null" style="overflow:auto;margin-top:20px; margin-left:24px; position:relative;" class="dependency-matrix-container">
-                <table class="dependency-matrix table table-bordered">
-                    <thead>
-                        <tr class="mrow">
-                            <th class="invisible-cell" style="border-right:1px solid white"></th>
-                            <th class="invisible-cell mcol"></th>
-                            <th *ngFor="let revision of dependencyMatrixData.revisions; let colIndex = index" [ngClass]="['mcol', 'cmptype-' + ComponentType[revision.component.type]]">{{(ComponentType[revision.component.type])| truncate : 1}}{{dependencyMatrixData.typeIndex[colIndex]}}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="mrow">
-                            <th></th>
-                            <th class="mcol"></th>
-                            <th class="mcol" *ngFor="let count of dependencyMatrixData.revisions">
-                            </th>
-                        </tr>
-                        <tr *ngFor="let row of dependencyMatrixData.matrix; let rowIndex=index" class="mrow">
-                            <th class="legend" [tooltip]="dependencyMatrixData.labels[rowIndex]" container="body">
-                                <span>{{dependencyMatrixData.labels[rowIndex]}}</span>
-                            </th>
-                            <th [ngClass]="['cmptype-col', 'cmptype-' + ComponentType[dependencyMatrixData.revisions[rowIndex].component.type]]">
-                                {{(ComponentType[dependencyMatrixData.revisions[rowIndex].component.type])| truncate : 1}}{{dependencyMatrixData.typeIndex[rowIndex]}}
-                            </th>
-                            <ng-container *ngFor="let relationData of row; let colIndex=index">
-                                <template #popTemplate>
-                                    <table class="pop-table">
-                                        <tr>
-                                            <th style="font-weight:normal">{{relationData.ownerTypeLabel}}</th>
-                                            <td style="font-weight:bold">{{relationData.ownerLabel}}</td>
-                                        </tr>
-                                        <tr>
-                                            <th></th>
-                                            <td>{{relationData.dependencyText}}</td>
-                                        </tr>
-                                        <tr>
-                                            <th style="font-weight:normal">{{relationData.calleeTypeLabel}}</th>
-                                            <td style="font-weight:bold">{{relationData.calleeLabel}}</td>
-                                        </tr>
-                                        <tr *ngIf="relationData.callerLabel != relationData.ownerLabel">
-                                            <th style="font-weight:normal"></th>
-                                            <td>because of</td>
-                                        </tr>
-                                        <tr *ngIf="relationData.callerLabel != relationData.ownerLabel">
-                                            <th style="font-weight:normal">{{relationData.callerTypeLabel}}</th>
-                                            <td>{{relationData.callerLabel}}</td>
-                                        </tr>
-                                        <ng-container *ngIf="Array.from(relationData.relation.annotations.keys()).length > 0">
-                                            <tr>
-                                                <td>&nbsp;</td>
-                                            </tr>
-                                            <tr>
-                                                <th><i style="color:#999">Annotations</i></th>
-                                            </tr>
-                                            <ng-container [ngSwitch]="key" *ngFor="let key of Array.from(relationData.relation.annotations.keys())">
-                                                <tr *ngSwitchCase="'ad.discovered_at'">
-                                                    <th>First seen</th>
-                                                    <td>{{relationData.relation.annotations.get(key)| date:'yyyy-MM-dd hh:mm:ss'}}</td>
-                                                </tr>
-                                                <tr *ngSwitchCase="'ad.async'">
-                                                    <th>Asynchronous</th>
-                                                    <td>true</td>
-                                                </tr>
-                                                <tr *ngSwitchCase="'sa'"></tr>
-                                                <tr *ngSwitchDefault>
-                                                    <th>{{key}}</th>
-                                                    <td>{{relationData.relation.annotations.get(key)}}</td>
-                                                </tr>
-                                            </ng-container>
-                                        </ng-container>
-                                    </table>
+          </tr>
+          <!--<ng-container *ngIf="Array.from(selectedRelationData.relation.annotations.keys()).length > 0">-->
+          <ng-container>
+            <tr>
+              <td>&nbsp;</td>
+            </tr>
+            <tr>
+              <th><i style="color:#999">Annotations</i></th>
+            </tr>
+            <ng-container [ngSwitch]="key" *ngFor="let key of Array.from(selectedRelationData.relation.annotations.keys())">
+              <tr *ngSwitchCase="'ad.discovered_at'">
+                <th>First seen</th>
+                <td>{{selectedRelationData.relation.annotations.get(key)| date:'yyyy-MM-dd hh:mm:ss'}}</td>
+              </tr>
+              <tr *ngSwitchCase="'ad.async'">
+                <th>Asynchronous</th>
+                <td>true</td>
+              </tr>
+              <tr *ngSwitchCase="'sa'"></tr>
+              <tr *ngSwitchDefault>
+                <th>{{key}}</th>
+                <td>{{selectedRelationData.relation.annotations.get(key)}}</td>
+              </tr>
+            </ng-container>
+          </ng-container>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modalRef.hide()">Close</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
 
-                                </template>
-                                <td *ngIf="relationData">
-
-                                    <button style="width:100%; background: transparent; outline: none; border:none" [popover]="popTemplate" popoverTitle="Relation Details"
-                                        placement="right" container="body" triggers="focus" *ngIf="relationData.ownerLabel == relationData.callerLabel">x</button>
-                                    <button style="width:100%; background: transparent; outline: none; border:none; color: #aaa" [popover]="popTemplate" popoverTitle="Relation Details"
-                                        placement="right" container="body" triggers="focus" *ngIf="relationData.ownerLabel != relationData.callerLabel && showIndirectRelations">x</button>
-                                </td>
-                                <td *ngIf="!relationData && colIndex == rowIndex">
-                                    -
-                                </td>
-                                <td *ngIf="!relationData && colIndex != rowIndex">
-                                </td>
-
-                            </ng-container>
-                        </tr>
-                        <tbody>
-                </table>
-            </div>

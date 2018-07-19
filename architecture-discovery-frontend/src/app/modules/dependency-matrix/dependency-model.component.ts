@@ -4,7 +4,6 @@ import { ComponentType } from '../../models/base/enums';
 import { environment } from 'environments/environment';
 import { Component as ngComponent, OnInit, ViewChild, ElementRef, ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { ModalDirective } from 'ngx-bootstrap/modal/modal.component';
 import { Wrapper } from 'app/models/base/helper';
 import { ArchitectureService, RelationFilter } from 'app/services/architecture.service';
 import { Revision } from 'app/models/revision';
@@ -25,7 +24,7 @@ export class DependencyModelComponent implements OnInit {
   private Array = Array;
   private snapshotFilter: SnapshotFilter;
 
-  private consideredLayerTypes: Array<ComponentType> = [ComponentType.Process, ComponentType.Activity, ComponentType.Service, ComponentType.Instance, ComponentType.Hardware];
+  private consideredLayerTypes: Array<ComponentType> = [ComponentType.Domain, ComponentType.Service, ComponentType.Instance, ComponentType.Database, ComponentType.Hardware];
   private layerFilterMap: Map<ComponentType, Wrapper<boolean>> = new Map();
   private btnLoader: Map<string, Wrapper<boolean>> = new Map();
   private loadedArchitecture: Architecture = null;
@@ -87,13 +86,14 @@ export class DependencyModelComponent implements OnInit {
     if (this.loadedArchitecture) {
       const map: Map<ComponentType, Map<number, Revision>> = new Map();
 
+      /*
       if (this.layerFilterMap.get(ComponentType.Activity).value === false) {
         this.layerFilterMap.get(ComponentType.Process).value = false;
         this.withActivity = false;
       } else {
         this.withActivity = true;
       }
-
+      */
       for (const key of Array.from(this.layerFilterMap.keys())) {
         if (this.layerFilterMap.get(key).value) {
           map.set(key, new Map())

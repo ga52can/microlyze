@@ -16,13 +16,16 @@ import { ChangelogService } from "app/services/changelog.service";
 import { DependencyModelRoutingModule } from "app/modules/dependency-matrix/dependency-model.routing-module";
 import { DependencyModelComponent } from "app/modules/dependency-matrix/dependency-model.component";
 import { LaddaModule } from "angular2-ladda/module/module";
-import { TruncatePipe } from "app/shared/pipes";
+import { TruncatePipe, OrderByPipe } from "app/shared/pipes";
 import {DependencyMatrixComponent} from "./dependency-matrix.component";
 import {ComponentGraphComponent} from "../graph-visualization/component-graph.component";
 import {ComponentGraphCanvasComponent} from "../graph-visualization/component-graph-canvas.component";
 import {ModeledRelationService} from "../../services/modeled-relation.service";
 import {ComponentService} from "../../services/component.service";
 import {RevisionService} from "../../services/revision.service";
+import {DependencyRelationCanvasComponent} from "./dependencyRelation-canvas.component";
+import {CytoscapeComponent} from "./cytoscape.component";
+import { CytoscapeModule } from 'ngx-cytoscape';
 
 @NgModule({
   imports: [
@@ -36,9 +39,10 @@ import {RevisionService} from "../../services/revision.service";
     FormsModule,
     CommonModule,
     DataTableModule,
-    LaddaModule
+    LaddaModule,
+    CytoscapeModule
   ],
-  declarations: [DependencyModelComponent, DependencyMatrixComponent, ComponentGraphComponent, ComponentGraphCanvasComponent, TruncatePipe],
+  declarations: [DependencyModelComponent, DependencyMatrixComponent, ComponentGraphComponent, ComponentGraphCanvasComponent, DependencyRelationCanvasComponent, TruncatePipe, OrderByPipe, CytoscapeComponent],
   providers: [
     ChangelogService,
     ArchitectureService,

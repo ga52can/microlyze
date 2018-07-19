@@ -40,7 +40,8 @@ public class RelationService {
             relation.setAnnotation("ad.discovered_at", String.valueOf(new Date().getTime()));
 
         Assert.notNull(relation);
-        cachedRelations.remove(relation);
+        if (relation.getId() != null)
+            cachedRelations.remove(relation);
         Relation result = (Relation) changelogService.saveAndLogPersistable(relation, relationRepository);
         cachedRelations.add(result);
         return result;

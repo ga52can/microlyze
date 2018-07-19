@@ -3,28 +3,25 @@
         <div class="card-block d-flex flex-column" style="position:relative">
             <div class="row headline">
                 <div class="col-md-12">
-                    <h4 class="card-title mb-0">Architecture Adjacency Matrix</h4>
+                    <h4 class="card-title mb-0">{{graphVisualization ? 'Graph Visualization' : 'Architecture Adjacency Matrix'}}</h4>
                     <div class="text-muted" style="font-size:14px" *ngIf="loadedArchitecture">
                         Time of snapshot:
                         <span *ngIf="fetchedSnapshot != null">{{fetchedSnapshot| date:'yyyy-MM-dd HH:mm:ss'}}</span>
                         <span *ngIf="fetchedSnapshot == null" class="badge badge-default">LIVE</span>
                         <span *ngIf="fetchedSnapshotOutdated" class="badge badge-danger">OUTDATED!</span>
                     </div>
-                    <div style="margin-bottom:9px">
-                      <label for="email">Graph Representation</label>
-                      <label class="switch switch-text switch-primary switch-lg switch-responsive pull-right">
-                        <input type="checkbox" class="switch-input" [(ngModel)]="showGraphRepresentation" (change) ="loadGraphRepresentation()">
-                        <span class="switch-label" data-on="ON" data-off="OFF">OFF</span>
-                        <span class="switch-handle"></span>
-                      </label>
-                    </div>
                 </div>
             </div>
 
-<!-- adjecency matrix component -->
-    <depdendency-matrix-component [unmappedTraces]="unmappedTraces" [processes]="processes" [activityMap]="activityMap">
-    </depdendency-matrix-component>
+        <hr class="mb-4" style="margin-left:0px; margin-right:0px; position:relative">
+          <!-- adjecency matrix component -->
+        <depdendency-matrix-component *ngIf="graphVisualization == false" [dependencyMatrixData]="dependencyMatrixData" [btnLoader]="btnLoader" [loadedArchitecture]="loadedArchitecture" [showIndirectRelations]="showIndirectRelations">
+        </depdendency-matrix-component>
 
+          <graph-component *ngIf="graphVisualization" [fetchedSnapshot]="fetchedSnapshot" [withActivity]="withActivity">
+          </graph-component>
+
+        </div>
     </div>
     <!--/.col-->
     <div class="card" style="background-color:#fafafa; border-left:none; min-width:330px; max-width:330px;">
@@ -86,6 +83,15 @@
                                     <span class="switch-label" data-on="ON" data-off="OFF">OFF</span>
                                     <span class="switch-handle"></span>
                                 </label>
+                </div>
+                <div style="margin-bottom:9px; margin-top:20px">
+                  <b>Visualization</b><br/><br/>
+                  <label for="email">Graph</label>
+                  <label class="switch switch-text switch-primary switch-lg switch-responsive pull-right">
+                    <input type="checkbox" class="switch-input" [(ngModel)]="graphVisualization">
+                    <span class="switch-label" data-on="ON" data-off="OFF">OFF</span>
+                    <span class="switch-handle"></span>
+                  </label>
                 </div>
             </div>
 

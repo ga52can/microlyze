@@ -16,10 +16,10 @@ import { Wrapper } from "app/models/base/helper";
 
 
 @ngComponent({
-    templateUrl: 'regex-mapper.component.html',
+    templateUrl: 'regex-domain-mapper.component.html',
     selector: 'regex-mapper-component'
 })
-export class RegexMapperComponent implements OnInit {
+export class RegexDomainMapperComponent implements OnInit {
     private HttpMethod = HttpMethod;
 
     //inputs

@@ -18,8 +18,13 @@ export class ArchitectureService extends ServiceBase {
     return this.getArchitecture(null, RelationFilter.ALL, null, [ComponentType.Process, ComponentType.Activity] );
   }
 
+  getCurrentDomainAndServiceArchitecture(): Observable<Architecture> {
+    return this.getArchitecture(null, RelationFilter.ALL, null, [ComponentType.Domain, ComponentType.Service] );
+  }
+
   getArchitecture(snapshot?: Date, relationFilter?: RelationFilter, annotationFilters?: Array<string>, componentTypeFilter?: Array<ComponentType>): Observable<Architecture> {
     var params = new HttpParams();
+    let componentArray = new Array<string>();
 
     if (snapshot)
       params = params.set('snapshot', (snapshot.getTime()).toString());
@@ -31,13 +36,12 @@ export class ArchitectureService extends ServiceBase {
       params = params.set('annotation-filter', annotationFilters.join());
 
     if (componentTypeFilter && componentTypeFilter.length > 0) {
-      let componentArray = new Array<string>();
-      for(let type of componentTypeFilter)
-        componentArray.push(ComponentType[type]);
-      params = params.set('component-type-filter', componentArray.join());
+      for ( let type of componentTypeFilter) {
+          componentArray.push(ComponentType[type]);
+      }
     }
-    //let options = new RequestOptions({ headers: this.headers, params: params1 });
-    // return this.http.get<Response>(this.apiUrl + 'architecture', options).map<Response, Architecture>(response => Architecture.deserialize(response));
+
+    params = params.set('component-type-filter', componentArray.join());
     let headers1 = new HttpHeaders();
     headers1.append('Authentication', 'Basic ' + btoa('cmluser:secret-1'));
     headers1.append('Content-Type', 'application/x-www-form-urlencoded');

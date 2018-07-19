@@ -2,7 +2,6 @@ import { Component as ngComponent, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import * as joint from 'jointjs';
 import * as jQuery from 'jquery'
-import { ModalDirective } from 'ngx-bootstrap/modal/modal.component';
 import { ProcessModellerCanvasComponent } from './process-modeller-canvas.component';
 
 import { Revision } from "app/models/revision";

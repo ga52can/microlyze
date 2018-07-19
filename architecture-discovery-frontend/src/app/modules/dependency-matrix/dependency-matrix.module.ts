@@ -16,7 +16,10 @@ import { ChangelogService } from "app/services/changelog.service";
 import { DependencyMatrixRoutingModule } from "app/modules/dependency-matrix/dependency-matrix.routing-module";
 import { DependencyMatrixComponent } from "app/modules/dependency-matrix/dependency-matrix.component";
 import { LaddaModule } from "angular2-ladda/module/module";
-import { TruncatePipe } from "app/shared/pipes";
+import { TruncatePipe, OrderByPipe } from "app/shared/pipes";
+import { DependencyRelationCanvasComponent } from "./dependencyRelation-canvas.component";
+import { CytoscapeModule } from 'ngx-cytoscape';
+import { CytoscapeComponent } from "./cytoscape.component"
 
 @NgModule({
   imports: [
@@ -30,9 +33,10 @@ import { TruncatePipe } from "app/shared/pipes";
     FormsModule,
     CommonModule,
     DataTableModule,
-    LaddaModule
+    LaddaModule,
+    CytoscapeModule
   ],
-  declarations: [DependencyMatrixComponent, TruncatePipe],
+  declarations: [DependencyMatrixComponent, TruncatePipe, DependencyRelationCanvasComponent, OrderByPipe, CytoscapeComponent],
   providers: [
     ChangelogService,
     ArchitectureService

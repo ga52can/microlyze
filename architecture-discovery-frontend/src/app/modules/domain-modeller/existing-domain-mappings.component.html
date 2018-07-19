@@ -1,0 +1,54 @@
+<div class="d-flex flex-row align-items-stretch" style="height:100%">
+    <div class="card flex-column" style="width:100%; margin-right:10px; margin-bottom:0px;">
+        <div class="card-block d-flex flex-column">
+            <div class="row headline">
+                <div class="col-md-12">
+                    <h4 class="card-title mb-0">Existing Mappings</h4>
+                </div>
+            </div>
+            <div style="flex:1; overflow: auto; margin-top:20px">
+                <table class="table table-striped" [mfData]="componentMappings" [mfSortBy]="'time'" [mfSortOrder]="'desc'" [mfRowsOnPage]="20"
+                    #mf="mfDataTable">
+                    <thead>
+                        <tr>
+                            <th>
+                                <mfDefaultSorter by="process">Domain</mfDefaultSorter>
+                            </th>
+                            <th>
+                                <mfDefaultSorter by="activity">Service</mfDefaultSorter>
+                            </th>
+                            <th>
+                                <mfDefaultSorter by="componentMapping.httpPathRegex">Regular expression</mfDefaultSorter>
+                            </th>
+                            <th>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let mapping of mf.data">
+                            <td class="align-middle">{{mapping.process}}</td>
+                            <td class="align-middle">{{mapping.activity}}</td>
+                            <td class="align-middle">{{mapping.componentMapping.httpPathRegex}}</td>
+                            <td class="text-right align-middle">
+                                <button type="button" class="btn btn-danger" (click)="delete(mapping)" [ladda]='btnLoader.get(mapping.componentMapping.id).value'>
+                                    <span class="fa fa-trash" aria-hidden="true" style="font-size:20px"></span>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5">
+                                <mfBootstrapPaginator [rowsOnPageSet]="[5,10,15,20]"></mfBootstrapPaginator>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div style="position: absolute;top: 50%; text-align:center; width:100%; transform: translateY(-50%); font-size:30px; color:#ccc"
+                    *ngIf="componentMappings.length == 0">No mappings found</div>
+
+            </div>
+        </div>
+    </div>
+</div>
