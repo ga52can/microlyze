@@ -35,7 +35,7 @@ import { ChangelogService } from "app/services/changelog.service";
     TabsModule.forRoot(),
     ChartsModule,
     HttpClientModule,
-    ToasterModule,
+    ToasterModule.forRoot(),
     CommonModule,
     LaddaModule
   ],

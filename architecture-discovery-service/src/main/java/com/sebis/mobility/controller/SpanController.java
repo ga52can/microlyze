@@ -80,6 +80,13 @@ public class SpanController {
         }
     };
 
+    private Map<Long, Span> tempStorageSpans = new LinkedHashMap<Long, Span>(1000) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<Long, Span> entry) {
+            return size() > 1000;
+        }
+    };
+
     private Map<Long, List<Relation>> latestRelationsByParent = new LinkedHashMap<Long, List<Relation>>(100) {
         @Override
         protected boolean removeEldestEntry(Map.Entry<Long, List<Relation>> entry) {
@@ -113,6 +120,10 @@ public class SpanController {
             Annotation csAnnotation = null;
             Annotation srAnnotation = null;
 
+            Span tempSpan = this.tempStorageSpans.get(span.id);
+            if (tempSpan == null)
+                this.tempStorageSpans.put(span.id, span);
+
             //// 0 Update Components based on the endpoints
             // 0.1 Create Components (Service, Instance, Hardware) from endpoint information
             boolean allEndpointsAreValid = true;
@@ -134,6 +145,7 @@ public class SpanController {
             for (BinaryAnnotation annotation : span.binaryAnnotations)
                 updateComponents(annotation.endpoint);
 
+            /*
             //// 2  Discover relations between services
             // 2.1  compute the first span of a transaction (usually Zuul's SR-Response to the not instrumented client)
             //      Mapping of the first span's path (name) with a service via the ComponentMapping-collection
@@ -147,6 +159,7 @@ public class SpanController {
                         method = new String(annotation.value).toUpperCase();
                     }
                 }
+
 
                 // 2.1.1 Create discovered relations between service <-> activities
                 Boolean mappingFound = false;
@@ -185,6 +198,7 @@ public class SpanController {
                     unmappedTrace.setTraceId(span.traceId);
                     unmappedTraceService.saveUnmappedTrace(unmappedTrace);
                 }
+
             }
             // 2.2  if a span contains a client-sent(CS) or server-received(SR) annotation, add the span to a incomplete relation.
             //      After the CS and the SR of one span was discovered, fulfill the relation and save it persistently, if not already existent.
@@ -238,6 +252,56 @@ public class SpanController {
                     }
                 }
             }
+            */
+
+            //// 3  Discover relations between services through parent - child ids
+            // 3.1  compute the first span of a transaction (usually Zuul's SR-Response to the not instrumented client)
+            //      Mapping of the first span's path (name) with a service via the ComponentMapping-collection
+            //      and creation of newly discovered relations between activities and services.
+            Annotation annotation = (csAnnotation != null) ? csAnnotation : srAnnotation;
+            Revision serviceRevision = getServiceRevision(annotation.endpoint);
+            Revision instanceRevision = getInstanceRevision(annotation.endpoint);
+            Revision hardwareRevision = getHardwareRevision(annotation.endpoint);
+            addTransactionRelation(checkForExistingRelation(serviceRevision, serviceRevision, instanceRevision), span);
+            addTransactionRelation(checkForExistingRelation(instanceRevision, instanceRevision, hardwareRevision), span);
+
+            if (span.parentId != null) {
+
+                Span parentSpan = this.tempStorageSpans.get(span.parentId);
+
+                if (parentSpan != null) {
+                    Revision callerRevision = getServiceRevision(parentSpan.annotations.get(0).endpoint);
+                    Relation r = this.relationService.findByOwnerAndCallerAndCallee(callerRevision, callerRevision, serviceRevision);
+                    if (r == null) {
+                        Relation relation = new Relation();
+                        relation.setOwner(callerRevision);
+                        relation.setCaller(callerRevision);
+                        relation.setCallee(serviceRevision);
+
+                        // add all annotations to the new discovered relation
+                        relation.setAnnotationsFromBinaryAnnotations(span.binaryAnnotations);
+
+                        //if the relation is complete (has caller and callee), save it persistently and generate transitive relations (S1 -> S2 and S2-> S3 => S1 -> S3)
+                        if (relation.getCaller() != null && relation.getCallee() != null) {
+                            addTransactionRelation(relation, span);
+                        }
+                    }
+                }
+
+                // Store local components
+            } else {
+                for (BinaryAnnotation bannotation : span.binaryAnnotations) {
+                    if (bannotation.key.toLowerCase().equals("lc")) {
+                        localComponentSpans.put(span.id, span);
+                        if (latestRelationsByParent.containsKey(span.id)) {
+                            for (Relation relation : latestRelationsByParent.get(span.id)) {
+                                proceedLocalComponentForRelation(span.id, relation);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -259,30 +323,48 @@ public class SpanController {
         List<Relation> relations = transactionRelations.computeIfAbsent(span.traceId, k -> new ArrayList<>());
         List<Relation> relationsToCheck = new ArrayList<>();
         relationsToCheck.add(relation);
-        while (relationsToCheck.size() > 0) {
-            relation = relationsToCheck.get(0);
+        if(relation != null) {
+            while (relationsToCheck.size() > 0) {
+                relation = relationsToCheck.get(0);
 
-            // if the id is null, its uncertainly, if the relation already exists, checking against the object-repository required
-            if (relation.getId() == null) {
-                Relation existingRelation = relationService.findByOwnerAndCallerAndCallee(relation.getOwner(), relation.getCaller(), relation.getCallee());
+                // if the id is null, its uncertainly, if the relation already exists, checking against the object-repository required
+                if (relation.getId() == null) {
+                    Relation existingRelation = relationService.findByOwnerAndCallerAndCallee(relation.getOwner(), relation.getCaller(), relation.getCallee());
 
-                // the relation exists already and is not new discovered. So use the found relation-object for further processing and add newly discovered annotations
-                if (existingRelation != null) {
-                    // Todo: Check if there are really new annotations and if not, dont update/save the object! (many wrong update-Changelogs because of useless object-updates without changes)
-                    existingRelation.setAnnotations(relation.getAnnotations());
-                    relation = existingRelation;
+                    // the relation exists already and is not new discovered. So use the found relation-object for further processing and add newly discovered annotations
+                    if (existingRelation != null) {
+                        // Todo: Check if there are really new annotations and if not, dont update/save the object! (many wrong update-Changelogs because of useless object-updates without changes)
+                        existingRelation.setAnnotations(relation.getAnnotations());
+                        relation = existingRelation;
+                    }
+                    relation = relationService.saveRelation(relation);
                 }
-                relation = relationService.saveRelation(relation);
-            }
-            // if the id is not null, this relation is already persistently stored,
-            else if (relation.annotationsRequireSave())
-                relation = relationService.saveRelation(relation);
+                // if the id is not null, this relation is already persistently stored,
+                else if (relation.annotationsRequireSave())
+                    relation = relationService.saveRelation(relation);
 
-            relations.add(relation);
-            // get all new transitive relations of the set of transaction-relations and the current relation
-            relationsToCheck.addAll(getTransitiveRelations(relation, relations));
-            relationsToCheck.remove(relation);
+                relations.add(relation);
+                // get all new transitive relations of the set of transaction-relations and the current relation
+                relationsToCheck.addAll(getTransitiveRelations(relation, relations));
+                relationsToCheck.remove(relation);
+            }
         }
+    }
+
+    // check if relation exists, if not create one, but do not save
+    private Relation checkForExistingRelation(Revision owner,Revision caller,Revision callee) {
+        Relation relation = null;
+        Relation checkRelation = relationService.findByOwnerAndCallerAndCallee(owner,caller, callee);
+        if (checkRelation == null) {
+            relation = new Relation();
+            relation.setOwner(owner);
+            relation.setCaller(caller);
+            relation.setCallee(callee);
+        } else {
+            relation = checkRelation;
+        }
+
+        return relation;
     }
 
     // Finds and returns transitive relations between a relation and a list of relations

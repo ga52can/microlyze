@@ -7,7 +7,7 @@ import * as dagre from 'cytoscape-dagre';
 import { RepositoryService } from '../services/repository.service';
 import { RelationService } from '../services/relation.service';
 import { ComponentType } from 'app/models/base/enums';
-import { GraphComponent } from '../models/GraphComponent';
+import { GraphComponent } from '../models/graphComponent';
 import { OpenapiService } from '../services/openapi.service';
 
 @Component({
